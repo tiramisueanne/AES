@@ -5,15 +5,13 @@
 using namespace std;
 
 //allows for easy access into a uint32_t
-class EasyBit{
+class EasyWord {
 public: 
-    EasyBit(uint32_t _content): content_(_content) {};
+    EasyWord(uint32_t _content): content_(_content) {};
     uint8_t get_bit(int index);
-
     //can return if fail or no fail
     bool set_bit(int index, bool new_val);
 private:
-
     uint32_t content_;
 }
 

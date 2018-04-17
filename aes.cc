@@ -1,12 +1,15 @@
 #include <vector>
 #include <cmath>
 #include <iostream>
+
+#include "aes.h"
 using namespace std;
 
 void KeyMaster::KeyMaster(const vector<uint_8t>& _key) : key_size_(_key.size()/4) {
 }
 
 uint32_t KeyMaster::get_round_key() {
+    return 42;
 }
 
 uint32_t KeyMaster::rotate_word(uint32_t _word) {
