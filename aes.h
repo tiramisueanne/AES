@@ -73,6 +73,7 @@ public:
     void decrypt_this(string _ciphertext);
 
 private:
+    size_t key_size_;
     //needs to be updated according to 
     //the size of the key
     uint8_t state_[4][4];
