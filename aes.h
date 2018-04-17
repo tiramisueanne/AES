@@ -4,16 +4,33 @@
 #include <vector>
 using namespace std;
 
+//allows for easy access into a uint32_t
+class EasyBit{
+public: 
+    EasyBit(uint32_t _content): content_(_content) {};
+    uint8_t get_bit(int index);
+
+    //can return if fail or no fail
+    bool set_bit(int index, bool new_val);
+private:
+
+    uint32_t content_;
+}
+
 //add helper functions to allow for easier to deal with 
 //code
 class KeyMaster {
 public:
     KeyMaster(const vector<uint_8t>& _key);
+
+    int get_num_rounds();
     
     //Cause and return calculations done on our current key
     uint32_t get_round_key();
 private:
-    size_t key_size_;
+    //key size in words
+    const size_t key_size_Nk;
+
     //I don't know if this is the easiest or not yet
     uint8_t **key_;
 

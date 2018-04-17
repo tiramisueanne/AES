@@ -3,9 +3,8 @@
 #include <iostream>
 using namespace std;
 
-
-void KeyMaster::KeyMaster(const vector<uint_8t>& _key) : key_size_(_key.size()) {
-           
+void KeyMaster::KeyMaster(const vector<uint_8t>& _key) : key_size_(_key.size()/4) {
+   key_ =         
 }
 
 uint32_t KeyMaster::get_round_key() {
