@@ -1,42 +1,13 @@
 #include <cmath>
 #include <string>
-#include <cstdint>
+#include <stdint.h>
 #include <vector>
 using namespace std;
 
-//allows for easy access into a uint32_t
-class EasyWord {
-public: 
-    EasyWord(uint32_t _content): content_(_content) {};
-    uint8_t get_bit(int index);
-    //can return if fail or no fail
-    bool set_bit(int index, bool new_val);
-private:
-    uint32_t content_;
-}
+typedef unsigned char uint_8t;
+typedef unsigned int uint_32t;
 
-//add helper functions to allow for easier to deal with 
-//code
-class KeyMaster {
-public:
-    KeyMaster(const vector<uint_8t>& _key);
-
-    int get_num_rounds();
-    
-    //Cause and return calculations done on our current key
-    uint32_t get_round_key();
-private:
-    //key size in words
-    const size_t key_size_Nk;
-
-    //I don't know if this is the easiest or not yet
-    uint8_t **key_;
-
-    //Deal with all of the  
-    uint32_t rotate_word(uint32_t _word);
-
-
-    uint8_t forward_s_table[256] = 
+const uint8_t S_TABLE[256] = 
     {
         0x63, 0x7C, 0x77, 0x7B, 0xF2, 0x6B, 0x6F, 0xC5, 0x30, 0x01, 0x67, 0x2B, 0xFE, 0xD7, 0xAB, 0x76,
         0xCA, 0x82, 0xC9, 0x7D, 0xFA, 0x59, 0x47, 0xF0, 0xAD, 0xD4, 0xA2, 0xAF, 0x9C, 0xA4, 0x72, 0xC0,
@@ -56,7 +27,7 @@ private:
         0x8C, 0xA1, 0x89, 0x0D, 0xBF, 0xE6, 0x42, 0x68, 0x41, 0x99, 0x2D, 0x0F, 0xB0, 0x54, 0xBB, 0x16
     };
 
-    uint8_t inverse_s_table[256] = 
+    const uint8_t INV_S_TABLE[256] = 
     {
     0x52, 0x09, 0x6A, 0xD5, 0x30, 0x36, 0xA5, 0x38, 0xBF, 0x40, 0xA3, 0x9E, 0x81, 0xF3, 0xD7, 0xFB,
     0x7C, 0xE3, 0x39, 0x82, 0x9B, 0x2F, 0xFF, 0x87, 0x34, 0x8E, 0x43, 0x44, 0xC4, 0xDE, 0xE9, 0xCB,
@@ -75,7 +46,40 @@ private:
     0xA0, 0xE0, 0x3B, 0x4D, 0xAE, 0x2A, 0xF5, 0xB0, 0xC8, 0xEB, 0xBB, 0x3C, 0x83, 0x53, 0x99, 0x61,
     0x17, 0x2B, 0x04, 0x7E, 0xBA, 0x77, 0xD6, 0x26, 0xE1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0C, 0x7D
     };    
+
+
+//allows for easy access into a uint32_t
+class EasyWord {
+public: 
+    uint32_t word_;
+    EasyWord(uint32_t _word): word_(_word) {};
+    uint8_t get_bit(int index);
+    //can return if fail or no fail
+    bool set_bit(int index, bool new_val);
+};
+
+//add helper functions to allow for easier to deal with 
+//code
+class KeyMaster {
+public:
+    KeyMaster(const vector<uint_8t>& _key);
+
+    int get_num_rounds();
     
+    //Cause and return calculations done on our current key
+    uint32_t get_round_key();
+private:
+    //key size in words
+    const size_t key_size_Nk_;
+
+    //I don't know if this is the easiest or not yet
+    uint8_t **key_;
+
+    //Deal with all of the  
+    uint32_t rotate_word(uint32_t _word);
+
+
+        
 
 };
 
