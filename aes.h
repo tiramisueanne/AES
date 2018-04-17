@@ -6,7 +6,7 @@ using namespace std;
 
 //allows for easy access into a uint32_t
 class EasyWord {
-public: 
+public:
     EasyWord(uint32_t _content): content_(_content) {};
     uint8_t get_bit(int index);
     //can return if fail or no fail
@@ -15,14 +15,14 @@ private:
     uint32_t content_;
 }
 
-//add helper functions to allow for easier to deal with 
+//add helper functions to allow for easier to deal with
 //code
 class KeyMaster {
 public:
     KeyMaster(const vector<uint_8t>& _key);
 
     int get_num_rounds();
-    
+
     //Cause and return calculations done on our current key
     uint32_t get_round_key();
 private:
@@ -32,11 +32,11 @@ private:
     //I don't know if this is the easiest or not yet
     uint8_t **key_;
 
-    //Deal with all of the  
+    //Deal with all of the
     uint32_t rotate_word(uint32_t _word);
 
 
-    uint8_t forward_s_table[256] = 
+    uint8_t forward_s_table[256] =
     {
         0x63, 0x7C, 0x77, 0x7B, 0xF2, 0x6B, 0x6F, 0xC5, 0x30, 0x01, 0x67, 0x2B, 0xFE, 0xD7, 0xAB, 0x76,
         0xCA, 0x82, 0xC9, 0x7D, 0xFA, 0x59, 0x47, 0xF0, 0xAD, 0xD4, 0xA2, 0xAF, 0x9C, 0xA4, 0x72, 0xC0,
@@ -56,7 +56,7 @@ private:
         0x8C, 0xA1, 0x89, 0x0D, 0xBF, 0xE6, 0x42, 0x68, 0x41, 0x99, 0x2D, 0x0F, 0xB0, 0x54, 0xBB, 0x16
     };
 
-    uint8_t inverse_s_table[256] = 
+    uint8_t inverse_s_table[256] =
     {
     0x52, 0x09, 0x6A, 0xD5, 0x30, 0x36, 0xA5, 0x38, 0xBF, 0x40, 0xA3, 0x9E, 0x81, 0xF3, 0xD7, 0xFB,
     0x7C, 0xE3, 0x39, 0x82, 0x9B, 0x2F, 0xFF, 0x87, 0x34, 0x8E, 0x43, 0x44, 0xC4, 0xDE, 0xE9, 0xCB,
@@ -74,24 +74,34 @@ private:
     0x60, 0x51, 0x7F, 0xA9, 0x19, 0xB5, 0x4A, 0x0D, 0x2D, 0xE5, 0x7A, 0x9F, 0x93, 0xC9, 0x9C, 0xEF,
     0xA0, 0xE0, 0x3B, 0x4D, 0xAE, 0x2A, 0xF5, 0xB0, 0xC8, 0xEB, 0xBB, 0x3C, 0x83, 0x53, 0x99, 0x61,
     0x17, 0x2B, 0x04, 0x7E, 0xBA, 0x77, 0xD6, 0x26, 0xE1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0C, 0x7D
-    };    
-    
+    };
+
 
 };
 
 class AES {
 public:
     AES(const vector<uint_8t>& _key);
-    
+
+    // round function -
+    //    for each round -
+    //      1. byte substitute using substitution table (sub_bytes)
+    //      2. shift rows of state_ array by different outsets (shift_rows)
+    //      3. mix data within each column of the state_ array (mix_columns)
+    //      4. add round Key to State (from KeyMaster::get_round_key)
     void encrypt_this(string _plaintext);
 
     void decrypt_this(string _ciphertext);
 
 private:
 
-    //oooooh goodness me 
+    //oooooh goodness me
     KeyMaster master_;
-    //needs to be updated according to 
+
+    //all operations performed on state_, a 2D array of bytes
+    //consists of 4 rows of ((block length) / 32) bytes
+    
+    //needs to be updated according to
     //the size of the key
     uint8_t state_[4][4];
 
@@ -103,16 +113,19 @@ private:
 
     //Round key is added to the state
     void add_round_key(uint32_t _word);
-    
+
+    //shift state array rows by different offsets
+    void shift_rows();
+
     //mix column data within state
     void mix_columns();
 
-    //The inverse of mix_columns 
-    void inv_mix_columns(); 
+    //The inverse of mix_columns
+    void inv_mix_columns();
 
     //utilize S-box to change state bytes
     void sub_bytes();
-    
+
     //utilize S-box to update given word
     uint32_t sub_word(uint32_t _word);
 };

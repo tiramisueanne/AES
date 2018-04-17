@@ -17,12 +17,18 @@ uint32_t KeyMaster::rotate_word(uint32_t _word) {
 }
 
 AES::AES(const vector<uint_8>& _key){
+
 }
 
+// 
+//
+//
+//
+//
 void AES::encrypt_this(string _plaintext) {
-    //do the for look that is appropriate for the 
+    //do the for look that is appropriate for the
     //key length
-    
+
     //cout the product of our encryption
 }
 
@@ -30,6 +36,10 @@ void AES::expand_key(const vector<uint_8t>& _key) {
 }
 
 void AES::add_round_key(uint32_t _word) {
+}
+
+void AES::shift_rows() {
+
 }
 
 void AES::mix_columns() {
