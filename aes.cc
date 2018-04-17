@@ -3,7 +3,9 @@
 #include <iostream>
 using namespace std;
 
-void KeyMaster::KeyMaster(const vector<uint_8t>& _key) {
+
+void KeyMaster::KeyMaster(const vector<uint_8t>& _key) : key_size_(_key.size()) {
+           
 }
 
 uint32_t KeyMaster::get_round_key() {
@@ -13,10 +15,7 @@ uint32_t KeyMaster::rotate_word(uint32_t _word) {
     return 42;
 }
 
-AES::AES(const vector<uint_8>& _key): key_size_(_key.size()) {
-    //Check if key_size is appropriate, then throw exception
-    //if not 
-    //if(key_size_ 
+AES::AES(const vector<uint_8>& _key){
 }
 
 void AES::encrypt_this(string _plaintext) {
