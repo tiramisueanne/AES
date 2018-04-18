@@ -27,7 +27,10 @@ KeyMaster::KeyMaster(const vector<uint_8t>& _key) : key_size_Nk_(_key.size()/4) 
 }
 
 int KeyMaster::get_num_rounds() {
-    return 42;
+  switch(key_size_Nk_) {
+    case 4: return 10;
+    case 8: return 14;
+  }
 }
 
 uint32_t KeyMaster::get_round_key() {
@@ -36,13 +39,6 @@ uint32_t KeyMaster::get_round_key() {
 
 uint32_t KeyMaster::rotate_word(uint32_t _word) {
     return 42;
-}
-
-uint8_t KeyMaster::get_num_rounds() {
-    switch(key_size_Nk_) {
-      case 4: return 10;
-      case 8: return 14;
-    }
 }
 
 AES::AES(const vector<uint_8t>& _key): master_(_key){
@@ -71,7 +67,7 @@ void AES::encrypt_this(string _plaintext) {
       //put block in state
       input_to_state(block);
 
-      for (uint8_t j = 0; j < master_.get_num_rounds() - 1; j++) {
+      for (int j = 0; j < master_.get_num_rounds() - 1; j++) {
         sub_bytes();
         shift_rows();
         mix_columns();
@@ -117,9 +113,6 @@ vector<uint8_t> AES::matrix_multiply(uint_8t matrix[4][4]) {
     }
 }
 
-void AES::shift_rows() {
-}
-
 void AES::mix_columns() {
     //given in whitepaper
     uint8_t mult_by_mat[4][4] = {
@@ -132,7 +125,19 @@ void AES::mix_columns() {
     matrix_multiply(mult_by_mat);
 }
 
+//bytes in the last three rows of state_ are shifted by different offsets
+// s0,0   s0,1    s0,2    s0,3           s0,0   s0,1    s0,2    s0,3
+// s1,0   s1,1    s1,2    s1,3    --->   s1,1   s1,2    s1,3    s1,0  (offset 1)
+// s2,0   s2,1    s2,2    s2,3    --->   s2,2   s2,3    s2,0    s2,1  (offset 2)
+// s3,0   s3,1    s3,2    s3,3           s3,3   s3,0    s3,1    s3,2  (offset 3)
 void AES::shift_rows() {
+  uint8_t new_state[4][4] = {
+    {state_[0][0], state_[0][1], state_[0][2], state_[0][3]},
+    {state_[1][1], state_[1][2], state_[1][3], state_[1][0]},
+    {state_[2][2], state_[2][3], state_[2][0], state_[2][1]},
+    {state_[3][3], state_[3][0], state_[3][1], state_[3][2]}
+  };
+  state_ = new_state;
 }
 
 void AES::mix_columns() {
@@ -141,7 +146,7 @@ void AES::mix_columns() {
       {2, 3, 1, 1},
       {1, 2, 3, 1},
       {1, 1, 2, 3},
-      {3, 1, 1, 2,}
+      {3, 1, 1, 2}
     };
     //for every column of state_
     matrix_multiply(mult_by_mat);
