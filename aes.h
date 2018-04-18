@@ -72,15 +72,13 @@ private:
     //key size in words
     const size_t key_size_Nk_;
 
+    uint8_t current_key;
+
     //I don't know if this is the easiest or not yet
     uint8_t **key_;
 
     //Deal with all of the
     uint32_t rotate_word(uint32_t _word);
-
-
-
-
 };
 
 class AES {
@@ -88,11 +86,13 @@ public:
     AES(const vector<uint_8t>& _key);
 
     // round function -
-    //    for each round -
-    //      1. byte substitute using substitution table (sub_bytes)
-    //      2. shift rows of state_ array by different outsets (shift_rows)
-    //      3. mix data within each column of the state_ array (mix_columns)
-    //      4. add round Key to State (from KeyMaster::get_round_key)
+    //    for each block of set size
+    //      copy into state (input_to_state)
+    //      for each round -
+    //        1. byte substitute using substitution table (sub_bytes)
+    //        2. shift rows of state_ array by different outsets (shift_rows)
+    //        3. mix data within each column of the state_ array (mix_columns)
+    //        4. add round Key to State (from KeyMaster::get_round_key)
     void encrypt_this(string _plaintext);
 
     void decrypt_this(string _ciphertext);
@@ -112,6 +112,11 @@ private:
     //to be updated in every round
     uint32_t key_schedule[4];
 
+    //moves ((block length) / 32) bytes of input into state array
+    //  for 0 <= r < 4 and 0 <= c < ((block length) / 32)
+    //    s[r, c] = in[r + 4c]
+    void input_to_state(const vector<uint8_t>& input);
+
     //this will fill up our key schedule
     void expand_key(const vector<uint_8t>& _key);
 
@@ -129,6 +134,11 @@ private:
 
     //utilize S-box to change state bytes
     void sub_bytes();
+
+    //moves ((block length) / 32) bytes of state array to output
+    //  for 0 <= r < 4 and 0 <= c < ((block length) / 32)
+    //    out[r + 4c] = s[r, c]
+    vector<uint8_t>& state_to_output();
 
     //utilize S-box to update given word
     uint32_t sub_word(uint32_t _word);
