@@ -18,11 +18,20 @@ KeyMaster::KeyMaster(const vector<uint_8t>& _key) {
     key_Nb = (size_t) 4;
     key_Nk = (size_t) _key.size()/4;
     key_Nr = (size_t) (_key.size() == 16 ? 10:14);
-    key_schedule = (uint32_t*) new int[key_Nb * (key_Nr+1)];
+    key_schedule = (uint32_t*) &(new int[key_Nb * (key_Nr+1)]);
 }
 
 uint32_t KeyMaster::rotate_word(uint32_t _word) {
     return 42;
+}
+
+uint32_t sub_word(uint32_t _word) {
+    uint8_t[4] subbed_word;
+    uint8_t* byte_pointer = (uint8_t*) &_word;
+    for(int i = 0; i < 4; i++){
+        subbed_word[i] = S_TABLE[byte_pointer[i]]; 
+    }
+    return (uint32_t) subbed_word;
 }
 
 AES::AES(const vector<uint_8t>& _key): master_(_key){
