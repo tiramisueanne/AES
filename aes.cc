@@ -6,8 +6,10 @@
 #include "aes.h"
 using namespace std;
 
-KeyMaster::KeyMaster(const vector<uint_8t>& _key) : key_size_Nk_(_key.size()/4) {
 
+
+KeyMaster::KeyMaster(const vector<uint_8t>& _key) : key_size_Nk_(_key.size()/4) {
+        
 }
 
 
@@ -20,6 +22,7 @@ uint32_t KeyMaster::rotate_word(uint32_t _word) {
 }
 
 AES::AES(const vector<uint_8t>& _key): master_(_key){
+    
 }
 
 void AES::encrypt_this(string _plaintext) {
@@ -29,7 +32,6 @@ void AES::encrypt_this(string _plaintext) {
 }
 
 void AES::add_round_key(uint32_t _word) {
-
 }
 
 vector<uint8_t> AES::matrix_multiply(uint_8t matrix[][]) {
@@ -74,6 +76,5 @@ void AES::sub_bytes() {
 }
 
 uint32_t AES::sub_word(uint32_t _word) {
-
-    return 42;
+    
 }

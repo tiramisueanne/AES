@@ -56,6 +56,7 @@ class EasyWord {
 public: 
     uint32_t word_;
     EasyWord(uint32_t _word): word_(_word) {};
+    uint8_t get_byte(int index);
     uint8_t get_bit(int index);
     //can return if fail or no fail
     bool set_bit(int index, bool new_val);
@@ -83,7 +84,6 @@ private:
 
     //utilize S-box to update given word
     uint32_t sub_word(uint32_t _word);
-
 };
 
 class AES {
