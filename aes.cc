@@ -14,23 +14,32 @@ uint8_t EasyWord::get_byte(int index) {
     return  byte_ptr[index];
 }
 
-KeyMaster::KeyMaster(const vector<uint_8t>& _key) {
-    key_Nb = (size_t) 4;
-    key_Nk = (size_t) _key.size()/key_Nb;
-    key_Nr = (size_t) (_key.size() == 16 ? 10:14);
-    key_schedule = (uint32_t*) &(new int[key_Nb * (key_Nr+1)]);
+KeyMaster::KeyMaster(const vector<uint_8t>& _key):
+    key_Nb(4),
+    key_Nk(_key.size()/key_Nb),
+    key_Nr(_key.size() == 16 ? 10:14)
+{
+    key_schedule = new uint32_t[key_Nb * (key_Nr+1)];
     
     //key_schedule algorithm, use first four words to generate the next four
     //repeat until you have enough for every
 
     //transfer the first four words of the key to the schedule
-    for(int i < 0; i < key_Nb; i++){
-	key_schedule[i] = (uint32_t*)&_key[i];
+    for(int i = 0; i < key_Nb; i++){
+        uint_8t new_word[4];
+        uint32_t word_to_put;
+        for(int j = 0; j < 4; j++) {
+            new_word[j] = _key[i*4 + j];
+        }
+        //this is a very dangerous thing to do, but 
+        //it would be how do. 
+        uint32_t *scary_ptr = reinterpret_cast<uint32_t*>(new_word);
+	    key_schedule[i] =  *scary_ptr; 
     }
 
     //add remaining blocks of four words to key schedule
-    for(int i < 0; i < key_Nr; i++){
-	add_four_words((i+1)*4);
+    for(int i = 0; i < key_Nr; i++) {
+	    add_four_words((i+1)*4);
     }
 
 }
@@ -64,31 +73,33 @@ uint32_t KeyMaster::magic(uint32_t _word, int _round) {
 
 //move leftmost byte to become the rightmost byte
 uint32_t KeyMaster::rotate_word(uint32_t _word) {
-    uint8_t[4] rotated_word;
+    uint8_t rotated_word[4];
     uint8_t* byte_pointer = (uint8_t*) &_word;
     rotated_word[0] = byte_pointer[1];
     rotated_word[1] = byte_pointer[2];
     rotated_word[2] = byte_pointer[3];
     rotated_word[3] = byte_pointer[0];
-    return (uint32_t) rotated_word;
+    return *(reinterpret_cast<uint32_t *>(rotated_word));
 }
 
 //perform simple s-box substitution
 uint32_t KeyMaster::sub_word(uint32_t _word) {
-    uint8_t[4] subbed_word;
+    uint8_t subbed_word[4];
     uint8_t* byte_pointer = (uint8_t*) &_word;
     for(int i = 0; i < 4; i++){
         subbed_word[i] = S_TABLE[byte_pointer[i]]; 
     }
-    return (uint32_t) subbed_word;
+    return *(reinterpret_cast<uint32_t *>(subbed_word));
+
 }
 
-AES::AES(const vector<uint_8t>& _key): master_(_key){
-    Nb_ = master_.key_Nb;
-    Nk_ = master_.key_Nk;
-    Nr_ = master.key_Nr;
+AES::AES(const vector<uint_8t>& _key): 
+    master_(_key),
+    Nb_(master_.key_Nb),
+    Nk_(master_.key_Nk),
+    Nr_(master_.key_Nr)
+{
     key_schedule_ = master_.key_schedule; 
-    state_ = new uint8_t[Nb_][Nb_];
 }
 
 void AES::encrypt_this(string _plaintext) {

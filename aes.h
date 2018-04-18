@@ -84,17 +84,21 @@ class KeyMaster {
 public:
     KeyMaster(const vector<uint_8t>& _key);
 
+    int get_num_rounds() { return key_Nr; };
+
+    uint32_t get_round_key();    
+    //number of rounds ( 128 bit - 10 | 256 bit - 14 )
+    const size_t key_Nr;
+
     //number of words in a state ( 128 bit - 4 | 256 bit - 4 )
     const size_t key_Nb;
     //number of words in a key ( 128 bit - 4 | 256 bit - 8 )
     const size_t key_Nk;
-    //number of rounds ( 128 bit - 10 | 256 bit - 14 )
-    const size_t key_Nr;
     //linear array of key_words, 4 for the start plus 4 for each round
     uint32_t* key_schedule;
 
 private:
-
+    
     //move leftmost byte to become the rightmost byte
     uint32_t rotate_word(uint32_t _word);
 
@@ -132,7 +136,7 @@ private:
     const size_t Nk_;
     const size_t Nr_;
     uint32_t* key_schedule_;
-    uint8_t state_;
+    uint8_t state_[4][4];
 
     //moves ((block length) / 32) bytes of input into state array
     //  for 0 <= r < 4 and 0 <= c < ((block length) / 32)
