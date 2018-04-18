@@ -63,6 +63,11 @@ void AES::encrypt_this(string _plaintext) {
 }
 
 void AES::input_to_state(const vector<uint_8t>& _input) {
+  for (uint8_t r = 0; r < 4; r++) {
+    for (uint8_t c = 0; c < 4; c++) {
+      state_[r, c] = _input[r + 4 * c];
+    }
+  }
 }
 
 void AES::expand_key(const vector<uint_8t>& _key) {
@@ -85,7 +90,15 @@ void AES::sub_bytes() {
 }
 
 vector<uint8_t>& AES::state_to_output() {
+  vector<uint8_t> output(20);
 
+  for (uint8_t r = 0; r < 4; r++) {
+    for (uint8_t c = 0; c < 4; c++) {
+      output[r + 4 * c] = state_[r, c];
+    }
+  }
+
+  return output&;
 }
 
 uint32_t AES::sub_word(uint32_t _word) {
