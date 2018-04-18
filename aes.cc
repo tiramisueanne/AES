@@ -90,7 +90,12 @@ void AES::shift_rows() {
 
 void AES::mix_columns() {
     //given in whitepaper
-    int mult_by_mat[4][4] = { {2, 3, 1, 1}, {1, 2, 3, 1}, {1, 1, 2, 3}, {3, 1, 1, 2,}};
+    int mult_by_mat[4][4] = {
+      {2, 3, 1, 1},
+      {1, 2, 3, 1},
+      {1, 1, 2, 3},
+      {3, 1, 1, 2}
+    };
     //for every column of state_
     for(int i = 0; i < 4; i++) {
         uint8_t new_col[4];

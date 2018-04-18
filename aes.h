@@ -10,7 +10,7 @@ typedef unsigned int uint_32t;
 //this is the number of words in each round key
 const int NB =4;
 
-const uint8_t S_TABLE[256] = 
+const uint8_t S_TABLE[256] =
     {
         0x63, 0x7C, 0x77, 0x7B, 0xF2, 0x6B, 0x6F, 0xC5, 0x30, 0x01, 0x67, 0x2B, 0xFE, 0xD7, 0xAB, 0x76,
         0xCA, 0x82, 0xC9, 0x7D, 0xFA, 0x59, 0x47, 0xF0, 0xAD, 0xD4, 0xA2, 0xAF, 0x9C, 0xA4, 0x72, 0xC0,
@@ -116,8 +116,6 @@ private:
     uint32_t key_schedule[4];
 
     //moves ((block length) / 32) bytes of input into state array
-    //  for 0 <= r < 4 and 0 <= c < ((block length) / 32)
-    //    s[r, c] = in[r + 4c]
     void input_to_state(const vector<uint8_t>& input);
 
     //this will fill up our key schedule
@@ -139,8 +137,6 @@ private:
     void sub_bytes();
 
     //moves ((block length) / 32) bytes of state array to output
-    //  for 0 <= r < 4 and 0 <= c < ((block length) / 32)
-    //    out[r + 4c] = s[r, c]
     vector<uint8_t>& state_to_output();
 
     //utilize S-box to update given word
