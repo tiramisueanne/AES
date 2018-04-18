@@ -10,16 +10,25 @@ using namespace std;
 
 uint8_t EasyWord::get_byte(int index) {
     assert(index >= 0 && index <= 3);
-    char *byte_ptr = (char *) &word_;
+    //haha this is pretty much cheating at c++
+    uint8_t *byte_ptr = reinterpret_cast<uint8_t *>(&word_);
     return  byte_ptr[index];
+}
+
+void EasyWord::set_byte(int index, uint8_t _val) {
+    assert(index >= 0 && index <= 3);
+    //haha this is pretty much cheating at c++
+    uint8_t *byte_ptr = reinterpret_cast<uint8_t *>(&word_);
+    byte_ptr[index] = _val; 
 }
 
 KeyMaster::KeyMaster(const vector<uint_8t>& _key) : key_size_Nk_(_key.size()/4) {
     //Key expansion algorithm
     uint_32t word;
+
     int i = 0;
     while(i < key_size_Nk_) {
-
+        i++;       
     }
 }
 
@@ -145,6 +154,4 @@ vector<uint8_t> AES::state_to_output() {
   return output;
 }
 
-uint32_t AES::sub_word(uint32_t _word) {
-    
-}
+

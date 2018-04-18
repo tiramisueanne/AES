@@ -57,9 +57,7 @@ public:
     uint32_t word_;
     EasyWord(uint32_t _word): word_(_word) {};
     uint8_t get_byte(int index);
-    uint8_t get_bit(int index);
-    //can return if fail or no fail
-    bool set_bit(int index, bool new_val);
+    void set_byte(int index, uint8_t _val);
 };
 
 //add helper functions to allow for easier to deal with
@@ -79,7 +77,7 @@ private:
     uint8_t current_key;
 
     //I don't know if this is the easiest or not yet
-    uint8_t **key_;
+    EasyWord *key_;
 
     //Deal with all of the
     uint32_t rotate_word(uint32_t _word);
@@ -149,6 +147,4 @@ private:
     //    out[r + 4c] = s[r, c]
     vector<uint8_t> state_to_output();
 
-    //utilize S-box to update given word
-    uint32_t sub_word(uint32_t _word);
 };
