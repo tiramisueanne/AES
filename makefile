@@ -1,4 +1,4 @@
-TARGET=tui
+TARGET=encryptotron
 
 all:
 	g++ *.cc -o $(TARGET)
