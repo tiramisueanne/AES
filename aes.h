@@ -56,6 +56,7 @@ class EasyWord {
 public:
     uint32_t word_;
     EasyWord(uint32_t _word): word_(_word) {};
+    uint8_t get_byte(int index);
     uint8_t get_bit(int index);
     //can return if fail or no fail
     bool set_bit(int index, bool new_val);
@@ -82,6 +83,9 @@ private:
 
     //Deal with all of the
     uint32_t rotate_word(uint32_t _word);
+
+    //utilize S-box to update given word
+    uint32_t sub_word(uint32_t _word);
 };
 
 class AES {
@@ -123,6 +127,8 @@ private:
 
     //Round key is added to the state
     void add_round_key(uint32_t _word);
+
+    vector<uint8_t> matrix_multiply(uint_8t matrix[4][4]);
 
     //shift state array rows by different offsets
     void shift_rows();
