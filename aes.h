@@ -7,9 +7,6 @@ using namespace std;
 typedef unsigned char uint_8t;
 typedef unsigned int uint_32t;
 
-//this is the number of words in each round key
-const int NB =4;
-
 const uint8_t S_TABLE[256] = 
     {
         0x63, 0x7C, 0x77, 0x7B, 0xF2, 0x6B, 0x6F, 0xC5, 0x30, 0x01, 0x67, 0x2B, 0xFE, 0xD7, 0xAB, 0x76,
@@ -68,18 +65,16 @@ class KeyMaster {
 public:
     KeyMaster(const vector<uint_8t>& _key);
 
-    int get_num_rounds();
+    //number of words in a state ( 128 bit - 4 | 256 bit - 4 )
+    const size_t key_Nb;
+    //number of words in a key ( 128 bit - 4 | 256 bit - 8 )
+    const size_t key_Nk;
+    //number of rounds ( 128 bit - 10 | 256 bit - 14 )
+    const size_t key_Nr;
 
-    //Cause and return calculations done on our current key
-    uint32_t get_round_key();
+    uint32_t* key_schedule;
+
 private:
-    //key size in words
-    const size_t key_size_Nk_;
-
-    uint8_t current_key;
-
-    //I don't know if this is the easiest or not yet
-    uint8_t **key_;
 
     //Deal with all of the
     uint32_t rotate_word(uint32_t _word);
@@ -108,6 +103,9 @@ private:
 
     //oooooh goodness me
     KeyMaster master_;
+    Nb_ = master_.key_Nb;
+    Nk_ = master_.key_Nk;
+    Nr_ = master_.key_Nr;
 
     //all operations performed on state_, a 2D array of bytes
     //consists of 4 rows of ((block length) / 32) bytes

@@ -14,21 +14,11 @@ uint8_t EasyWord::get_byte(int index) {
     return  byte_ptr[index];
 }
 
-KeyMaster::KeyMaster(const vector<uint_8t>& _key) : key_size_Nk_(_key.size()/4) {
-    //Key expansion algorithm
-    uint_32t word;
-    int i = 0;
-    while(i < key_size_Nk_) {
-
-    }
-}
-
-int KeyMaster::get_num_rounds() {
-    return 42;
-}
-
-uint32_t KeyMaster::get_round_key() {
-    return 42;
+KeyMaster::KeyMaster(const vector<uint_8t>& _key) {
+    key_Nb = (size_t) 4;
+    key_Nk = (size_t) _key.size()/4;
+    key_Nr = (size_t) (_key.size() == 16 ? 10:14);
+    key_schedule = (uint32_t*) new int[key_Nb * (key_Nr+1)];
 }
 
 uint32_t KeyMaster::rotate_word(uint32_t _word) {
