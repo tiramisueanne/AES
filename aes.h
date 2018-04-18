@@ -81,8 +81,8 @@ private:
     //Deal with all of the  
     uint32_t rotate_word(uint32_t _word);
 
-
-        
+    //utilize S-box to update given word
+    uint32_t sub_word(uint32_t _word);
 
 };
 
@@ -104,6 +104,8 @@ private:
     
     //Round key is added to the state
     void add_round_key(uint32_t _word);
+
+    vector<uint8_t> matrix_multiply(uint_8t matrix[][]);
     
     //mix column data within state
     void mix_columns();
@@ -114,6 +116,4 @@ private:
     //utilize S-box to change state bytes
     void sub_bytes();
     
-    //utilize S-box to update given word
-    uint32_t sub_word(uint32_t _word);
 };

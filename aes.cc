@@ -29,14 +29,11 @@ void AES::encrypt_this(string _plaintext) {
 }
 
 void AES::add_round_key(uint32_t _word) {
+
 }
 
-
-void AES::mix_columns() {
-    //given in whitepaper
-    int mult_by_mat[4][4] = { {2, 3, 1, 1}, {1, 2, 3, 1}, {1, 1, 2, 3}, {3, 1, 1, 2,}};
-    //for every column of state_ 
-    for(int i = 0; i < 4; i++) {
+vector<uint8_t> AES::matrix_multiply(uint_8t matrix[][]) {
+   for(int i = 0; i < 4; i++) {
         uint8_t new_col[4];
         //for every row value, we have to compute the matrix mult
         for(int j = 0; j < 4; j++) {
@@ -52,8 +49,18 @@ void AES::mix_columns() {
     }
 }
 
+
+void AES::mix_columns() {
+    //given in whitepaper
+    int mult_by_mat[4][4] = { {2, 3, 1, 1}, {1, 2, 3, 1}, {1, 1, 2, 3}, {3, 1, 1, 2,}};
+    //for every column of state_ 
+    matrix_multiply(mult_by_mat);
+}
+
 void AES::inv_mix_columns() {
-   }
+    int mult_by_mat[4][4] = { { 0xe, 0xb, 0xd, 0x9}, { 0x9, 0xe, 0xb, 0xd}, {0xd, 0x9, 0xe, 0xb}, {0xb, 0xd, 0x9, 0xe}};
+    matrix_multiply(mult_by_mat);    
+}
 
 void AES::sub_bytes() {
     //use the value within the state to index into S-box
