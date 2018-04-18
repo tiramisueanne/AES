@@ -134,7 +134,11 @@ void AES::shift_rows() {
     {state_[2][2], state_[2][3], state_[2][0], state_[2][1]},
     {state_[3][3], state_[3][0], state_[3][1], state_[3][2]}
   };
-  state_ = new_state;
+  for(int i = 0; i < 4; i++) {
+      for(int j = 0; j < 4; j++) {
+          state_[i][j] = new_state[i][j];
+      }
+  }
 }
 
 void AES::mix_columns() {
