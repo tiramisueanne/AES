@@ -85,12 +85,20 @@ void AES::encrypt_this(string _plaintext) {
     }
 }
 
+void AES::decrypt_this(string _ciphertext) {
+
+}
+
 void AES::input_to_state(const vector<uint_8t>& _input) {
   for (uint8_t r = 0; r < 4; r++) {
     for (uint8_t c = 0; c < 4; c++) {
       state_[r][c] = _input[r + 4 * c];
     }
   }
+}
+
+void AES::expand_key(const vector<uint_8t>& _key) {
+
 }
 
 void AES::add_round_key(uint32_t _word) {
@@ -111,18 +119,6 @@ vector<uint8_t> AES::matrix_multiply(uint_8t matrix[4][4]) {
             state_[j][i] = new_col[j];
         }
     }
-}
-
-void AES::mix_columns() {
-    //given in whitepaper
-    uint8_t mult_by_mat[4][4] = {
-      {2, 3, 1, 1},
-      {1, 2, 3, 1},
-      {1, 1, 2, 3},
-      {3, 1, 1, 2,}
-    };
-    //for every column of state_
-    matrix_multiply(mult_by_mat);
 }
 
 //bytes in the last three rows of state_ are shifted by different offsets
