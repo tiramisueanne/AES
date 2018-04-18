@@ -81,6 +81,10 @@ private:
 
     //utilize S-box to update given word
     uint32_t sub_word(uint32_t _word);
+
+    uint32_t magic(uint32_t _word);
+
+    void add_four_words(int _ks_idx);
 };
 
 class AES {

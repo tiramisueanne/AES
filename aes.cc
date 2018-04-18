@@ -16,9 +16,38 @@ uint8_t EasyWord::get_byte(int index) {
 
 KeyMaster::KeyMaster(const vector<uint_8t>& _key) {
     key_Nb = (size_t) 4;
-    key_Nk = (size_t) _key.size()/4;
+    key_Nk = (size_t) _key.size()/key_Nb;
     key_Nr = (size_t) (_key.size() == 16 ? 10:14);
     key_schedule = (uint32_t*) &(new int[key_Nb * (key_Nr+1)]);
+    
+    //transfer the first four words of the key to the schedule
+    for(int i < 0; i < key_Nb; i++){
+	key_schedule[i] = (uint32_t*)&_key[i];
+    }
+
+    //add remaining blocks of four words to key schedule
+    for(int i < 0; i < key_Nr; i++){
+	add_four_words((i+1)*4);
+    }
+
+}
+
+void KeyMaster::add_four_words(int _ks_idx){
+
+    uint32_t magic_word = magic(key_schedule[_ks_idx-1]);
+    //add first value	
+    key_schedule[_ks_idx] = key_schedule[_ks_idx-4] ^ magic_word;
+    //add second value
+    key_schedule[_ks_idx+1] = key_schedule[_ks_idx] ^ key_schedule[_ks_idx-3];  
+    //add third value
+    key_schedule[_ks_idx+2] = key_schedule[_ks_idx+1] ^ key_schedule[_ks_idx-2];
+    //add fourth value
+    key_schedule[_ks_idx+3] = key_schedule[_ks_idx+2] ^ key_schedule[_ks_idx-1];
+
+}
+
+uint32_t KeyMaster::magic(uint32_t _word) {
+    
 }
 
 uint32_t KeyMaster::rotate_word(uint32_t _word) {
