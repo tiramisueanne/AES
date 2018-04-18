@@ -20,6 +20,9 @@ KeyMaster::KeyMaster(const vector<uint_8t>& _key) {
     key_Nr = (size_t) (_key.size() == 16 ? 10:14);
     key_schedule = (uint32_t*) &(new int[key_Nb * (key_Nr+1)]);
     
+    //key_schedule algorithm, use first four words to generate the next four
+    //repeat until you have enough for every
+
     //transfer the first four words of the key to the schedule
     for(int i < 0; i < key_Nb; i++){
 	key_schedule[i] = (uint32_t*)&_key[i];
@@ -46,6 +49,7 @@ void KeyMaster::add_four_words(int _ks_idx){
 
 }
 
+//magic function to calculate first word per round
 uint32_t KeyMaster::magic(uint32_t _word, int _round) {
     uint32_t current_word = _word;
     
@@ -58,7 +62,7 @@ uint32_t KeyMaster::magic(uint32_t _word, int _round) {
     return current_word;
 }
 
-// move leftmost byte to become the rightmost byte
+//move leftmost byte to become the rightmost byte
 uint32_t KeyMaster::rotate_word(uint32_t _word) {
     uint8_t[4] rotated_word;
     uint8_t* byte_pointer = (uint8_t*) &_word;
@@ -80,7 +84,11 @@ uint32_t KeyMaster::sub_word(uint32_t _word) {
 }
 
 AES::AES(const vector<uint_8t>& _key): master_(_key){
-    
+    Nb_ = master_.key_Nb;
+    Nk_ = master_.key_Nk;
+    Nr_ = master.key_Nr;
+    key_schedule_ = master_.key_schedule; 
+    state_ = new uint8_t[Nb_][Nb_];
 }
 
 void AES::encrypt_this(string _plaintext) {

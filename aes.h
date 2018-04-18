@@ -79,8 +79,7 @@ public:
     bool set_bit(int index, bool new_val);
 };
 
-//add helper functions to allow for easier to deal with
-//code
+//could possibly use with EasyWord but it was too much work
 class KeyMaster {
 public:
     KeyMaster(const vector<uint_8t>& _key);
@@ -91,19 +90,21 @@ public:
     const size_t key_Nk;
     //number of rounds ( 128 bit - 10 | 256 bit - 14 )
     const size_t key_Nr;
-
+    //linear array of key_words, 4 for the start plus 4 for each round
     uint32_t* key_schedule;
 
 private:
 
-    //Deal with all of the
+    //move leftmost byte to become the rightmost byte
     uint32_t rotate_word(uint32_t _word);
 
-    //utilize S-box to update given word
+    //perform simple s-box substitution
     uint32_t sub_word(uint32_t _word);
 
+    //magic function to calculate the first word per round
     uint32_t magic(uint32_t _word, int _round);
 
+    //adds four new words to the key_schedule using the previous four
     void add_four_words(int _ks_idx);
 };
 
@@ -127,19 +128,11 @@ private:
 
     //oooooh goodness me
     KeyMaster master_;
-    Nb_ = master_.key_Nb;
-    Nk_ = master_.key_Nk;
-    Nr_ = master_.key_Nr;
-
-    //all operations performed on state_, a 2D array of bytes
-    //consists of 4 rows of ((block length) / 32) bytes
-
-    //needs to be updated according to
-    //the size of the key
-    uint8_t state_[4][4];
-
-    //to be updated in every round
-    uint32_t key_schedule[4];
+    const size_t Nb_;
+    const size_t Nk_;
+    const size_t Nr_;
+    uint32_t* key_schedule_;
+    uint8_t state_;
 
     //moves ((block length) / 32) bytes of input into state array
     //  for 0 <= r < 4 and 0 <= c < ((block length) / 32)
