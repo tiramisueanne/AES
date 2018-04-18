@@ -22,10 +22,16 @@ KeyMaster::KeyMaster(const vector<uint_8t>& _key) {
 }
 
 uint32_t KeyMaster::rotate_word(uint32_t _word) {
-    return 42;
+    uint8_t[4] rotated_word;
+    uint8_t* byte_pointer = (uint8_t*) &_word;
+    rotated_word[0] = byte_pointer[1];
+    rotated_word[1] = byte_pointer[2];
+    rotated_word[2] = byte_pointer[3];
+    rotated_word[3] = byte_pointer[0];
+    return (uint32_t) rotated_word;
 }
 
-uint32_t sub_word(uint32_t _word) {
+uint32_t KeyMaster::sub_word(uint32_t _word) {
     uint8_t[4] subbed_word;
     uint8_t* byte_pointer = (uint8_t*) &_word;
     for(int i = 0; i < 4; i++){
