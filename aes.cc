@@ -1,4 +1,5 @@
 #include <vector>
+#include <cassert>
 #include <cmath>
 #include <iostream>
 #include <stdint.h>
@@ -7,11 +8,24 @@
 using namespace std;
 
 
-
-KeyMaster::KeyMaster(const vector<uint_8t>& _key) : key_size_Nk_(_key.size()/4) {
-        
+uint8_t EasyWord::get_byte(int index) {
+    assert(index >= 0 && index <= 3);
+    char *byte_ptr = (char *) &word_;
+    return  byte_ptr[index];
 }
 
+KeyMaster::KeyMaster(const vector<uint_8t>& _key) : key_size_Nk_(_key.size()/4) {
+    //Key expansion algorithm
+    uint_32t word;
+    int i = 0;
+    while(i < key_size_Nk_) {
+
+    }
+}
+
+int KeyMaster::get_num_rounds() {
+    return 42;
+}
 
 uint32_t KeyMaster::get_round_key() {
     return 42;
@@ -45,20 +59,20 @@ void AES::encrypt_this(string _plaintext) {
         block.push_back(_vectortext[i + j]);
       }
       //put block in state
-      input_to_state(block)
+      input_to_state(block);
 
       for (uint8_t j = 0; j < master_.get_num_rounds() - 1; j++) {
-        sub_bytes()
-        shift_rows()
-        mix_columns()
-        add_round_key(master_.get_round_key())
+        sub_bytes();
+        shift_rows();
+        mix_columns();
+        add_round_key(master_.get_round_key());
       }
 
-      sub_bytes()
-      shift_rows()
-      add_round_key(master_.get_round_key())
+      sub_bytes();
+      shift_rows();
+      add_round_key(master_.get_round_key());
 
-      vector<uint8_t>& block_output = state_to_output()
+      vector<uint8_t> block_output = state_to_output();
       for (uint8_t j = 0; j < block_output.size(); j++) {
         _outputtext.push_back(block_output[j]);
       }
@@ -68,7 +82,7 @@ void AES::encrypt_this(string _plaintext) {
 void AES::input_to_state(const vector<uint_8t>& _input) {
   for (uint8_t r = 0; r < 4; r++) {
     for (uint8_t c = 0; c < 4; c++) {
-      state_[r, c] = _input[r + 4 * c];
+      state_[r][c] = _input[r + 4 * c];
     }
   }
 }
@@ -76,14 +90,14 @@ void AES::input_to_state(const vector<uint_8t>& _input) {
 void AES::add_round_key(uint32_t _word) {
 }
 
-vector<uint8_t> AES::matrix_multiply(uint_8t matrix[][]) {
+vector<uint8_t> AES::matrix_multiply(uint_8t matrix[4][4]) {
    for(int i = 0; i < 4; i++) {
         uint8_t new_col[4];
         //for every row value, we have to compute the matrix mult
         for(int j = 0; j < 4; j++) {
             //go through and multiply each val in column by matrix
             for(int k = 0; k < 4; k++) {
-                new_col[j] += state_[k][i] * mult_by_mat[j][k];
+                new_col[j] += state_[k][i] * matrix[j][k];
             }
         }
         //we now set our state value to the new column
@@ -94,18 +108,17 @@ vector<uint8_t> AES::matrix_multiply(uint_8t matrix[][]) {
 }
 
 void AES::shift_rows() {
-
 }
 
 void AES::mix_columns() {
     //given in whitepaper
-    int mult_by_mat[4][4] = { {2, 3, 1, 1}, {1, 2, 3, 1}, {1, 1, 2, 3}, {3, 1, 1, 2,}};
+    uint8_t mult_by_mat[4][4] = { {2, 3, 1, 1}, {1, 2, 3, 1}, {1, 1, 2, 3}, {3, 1, 1, 2,}};
     //for every column of state_ 
     matrix_multiply(mult_by_mat);
 }
 
 void AES::inv_mix_columns() {
-    int mult_by_mat[4][4] = { { 0xe, 0xb, 0xd, 0x9}, { 0x9, 0xe, 0xb, 0xd}, {0xd, 0x9, 0xe, 0xb}, {0xb, 0xd, 0x9, 0xe}};
+    uint8_t mult_by_mat[4][4] = { { 0xe, 0xb, 0xd, 0x9}, { 0x9, 0xe, 0xb, 0xd}, {0xd, 0x9, 0xe, 0xb}, {0xb, 0xd, 0x9, 0xe}};
     matrix_multiply(mult_by_mat);    
 }
 
@@ -120,16 +133,16 @@ void AES::sub_bytes() {
     }
 }
 
-vector<uint8_t>& AES::state_to_output() {
+vector<uint8_t> AES::state_to_output() {
   vector<uint8_t> output(20);
 
   for (uint8_t r = 0; r < 4; r++) {
     for (uint8_t c = 0; c < 4; c++) {
-      output[r + 4 * c] = state_[r, c];
+      output[r + 4 * c] = state_[r][c];
     }
   }
 
-  return output&;
+  return output;
 }
 
 uint32_t AES::sub_word(uint32_t _word) {

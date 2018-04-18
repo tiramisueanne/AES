@@ -83,12 +83,9 @@ private:
 
     //Deal with all of the
     uint32_t rotate_word(uint32_t _word);
-<<<<<<< HEAD
 
     //utilize S-box to update given word
     uint32_t sub_word(uint32_t _word);
-=======
->>>>>>> 4d0e931214538cc3a1e61d1283940e6fb6e26462
 };
 
 class AES {
@@ -133,14 +130,11 @@ private:
     //Round key is added to the state
     void add_round_key(uint32_t _word);
 
-<<<<<<< HEAD
-    vector<uint8_t> matrix_multiply(uint_8t matrix[][]);
+    vector<uint8_t> matrix_multiply(uint_8t matrix[4][4]);
     
-=======
     //shift state array rows by different offsets
     void shift_rows();
 
->>>>>>> 4d0e931214538cc3a1e61d1283940e6fb6e26462
     //mix column data within state
     void mix_columns();
 
@@ -149,16 +143,12 @@ private:
 
     //utilize S-box to change state bytes
     void sub_bytes();
-<<<<<<< HEAD
-    
-=======
 
     //moves ((block length) / 32) bytes of state array to output
     //  for 0 <= r < 4 and 0 <= c < ((block length) / 32)
     //    out[r + 4c] = s[r, c]
-    vector<uint8_t>& state_to_output();
+    vector<uint8_t> state_to_output();
 
     //utilize S-box to update given word
     uint32_t sub_word(uint32_t _word);
->>>>>>> 4d0e931214538cc3a1e61d1283940e6fb6e26462
 };
