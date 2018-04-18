@@ -128,7 +128,7 @@ private:
     //Round key is added to the state
     void add_round_key(uint32_t _word);
 
-    vector<uint8_t> matrix_multiply(uint_8t matrix[4][4]);
+    void matrix_multiply(uint_8t matrix[4][4]);
 
     //shift state array rows by different offsets
     void shift_rows();
@@ -143,7 +143,7 @@ private:
     void sub_bytes();
 
     //moves ((block length) / 32) bytes of state array to output
-    vector<uint8_t>& state_to_output();
+    vector<uint8_t> state_to_output();
 
     //utilize S-box to update given word
     uint32_t sub_word(uint32_t _word);

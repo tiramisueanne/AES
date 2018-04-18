@@ -30,6 +30,7 @@ int KeyMaster::get_num_rounds() {
   switch(key_size_Nk_) {
     case 4: return 10;
     case 8: return 14;
+    default: return 10;
   }
 }
 
@@ -104,7 +105,7 @@ void AES::expand_key(const vector<uint_8t>& _key) {
 void AES::add_round_key(uint32_t _word) {
 }
 
-vector<uint8_t> AES::matrix_multiply(uint_8t matrix[4][4]) {
+void AES::matrix_multiply(uint_8t matrix[4][4]) {
    for(int i = 0; i < 4; i++) {
         uint8_t new_col[4];
         //for every row value, we have to compute the matrix mult
