@@ -186,5 +186,5 @@ vector<uint8_t> AES::state_to_output() {
 }
 
 uint32_t AES::sub_word(uint32_t _word) {
-
+  return 42;
 }
