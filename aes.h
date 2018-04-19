@@ -12,11 +12,14 @@ typedef unsigned int uint_32t;
 //allows for easy access into a uint32_t
 class EasyWord {
 public:
-    uint32_t word_;
     EasyWord() {};
     EasyWord(uint32_t _word): word_(_word) {};
+    EasyWord& operator=(uint32_t _word){ word_ = _word; };
+    operator uint32_t() const { return word_; };
     uint8_t get_byte(int index);
     void set_byte(int index, uint8_t _val);
+private:
+    uint32_t word_;
 };
 
 //could possibly use with EasyWord but it was too much work
@@ -27,18 +30,16 @@ public:
     int get_num_rounds() { return key_Nr; };
 
     uint32_t get_round_key();
+
+private:
     //number of rounds ( 128 bit - 10 | 256 bit - 14 )
     const size_t key_Nr;
-
-    //I don't know if this is the easiest or not yet
-    EasyWord *key_;
     //number of words in a state ( 128 bit - 4 | 256 bit - 4 )
     const size_t key_Nb;
     //number of words in a key ( 128 bit - 4 | 256 bit - 8 )
     const size_t key_Nk;
-    //linear array of key_words, 4 for the start plus 4 for each round
-
-private:
+    //linear array of EasyWords, 4 for the start plus 4 for each round
+    EasyWord* key_schedule_;
 
     //move leftmost byte to become the rightmost byte
     uint32_t rotate_word(uint32_t _word);
@@ -46,14 +47,17 @@ private:
     //perform simple s-box substitution
     uint32_t sub_word(uint32_t _word);
 
-    //magic function to calculate the first word per round
-    uint32_t magic(uint32_t _word, int _round);
-
     //adds four new words to the key_schedule using the previous four
     void add_four_words(int _ks_idx);
+
+    //magic function to calculate the first word per round
+    uint32_t magic(uint32_t _word, int _round);
 };
 
 class AES {
+
+AES(const vector<uint_8>& _key): master_(_key) {};
+
 public:
     AES(const vector<uint_8t>& _key);
 
@@ -73,10 +77,6 @@ private:
 
     //oooooh goodness me
     KeyMaster master_;
-    const size_t Nb_;
-    const size_t Nk_;
-    const size_t Nr_;
-    EasyWord* key_schedule_;
     uint8_t state_[4][4];
 
     //moves ((block length) / 32) bytes of input into state array
