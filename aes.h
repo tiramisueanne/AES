@@ -1,4 +1,5 @@
 #include <cmath>
+#include <functional>
 #include <string>
 #include <stdint.h>
 #include <vector>
@@ -75,11 +76,10 @@ const uint8_t ROUND_CONSTANT[256] =
 class EasyWord {
 public:
     uint32_t word_;
+    EasyWord() {};
     EasyWord(uint32_t _word): word_(_word) {};
     uint8_t get_byte(int index);
-    uint8_t get_bit(int index);
-    //can return if fail or no fail
-    bool set_bit(int index, bool new_val);
+    void set_byte(int index, uint8_t _val);
 };
 
 //could possibly use with EasyWord but it was too much work
@@ -93,12 +93,13 @@ public:
     //number of rounds ( 128 bit - 10 | 256 bit - 14 )
     const size_t key_Nr;
 
+    //I don't know if this is the easiest or not yet
+    EasyWord *key_;
     //number of words in a state ( 128 bit - 4 | 256 bit - 4 )
     const size_t key_Nb;
     //number of words in a key ( 128 bit - 4 | 256 bit - 8 )
     const size_t key_Nk;
     //linear array of key_words, 4 for the start plus 4 for each round
-    uint32_t* key_schedule;
 
 private:
 
@@ -138,7 +139,7 @@ private:
     const size_t Nb_;
     const size_t Nk_;
     const size_t Nr_;
-    uint32_t* key_schedule_;
+    EasyWord* key_schedule_;
     uint8_t state_[4][4];
 
     //moves ((block length) / 32) bytes of input into state array
@@ -150,10 +151,11 @@ private:
     //Round key is added to the state
     void add_round_key(uint32_t _word);
 
-    void matrix_multiply(uint_8t matrix[4][4]);
-
     //shift state array rows by different offsets
     void shift_rows();
+    
+
+    void matrix_multiply(function<uint8_t(uint8_t)> matrix[4][4]);
 
     //mix column data within state
     void mix_columns();
@@ -166,7 +168,6 @@ private:
 
     //moves ((block length) / 32) bytes of state array to output
     vector<uint8_t> state_to_output();
-
-    //utilize S-box to update given word
-    uint32_t sub_word(uint32_t _word);
+    
+        
 };
