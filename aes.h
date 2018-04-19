@@ -163,8 +163,14 @@ private:
     //The inverse of mix_columns
     void inv_mix_columns();
 
+    //inverse of shift_rows
+    void inv_shift_rows();
+
     //utilize S-box to change state bytes
     void sub_bytes();
+
+    //inverse of sub_bytes
+    void inv_sub_bytes();
 
     //moves ((block length) / 32) bytes of state array to output
     vector<uint8_t> state_to_output();
