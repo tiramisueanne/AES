@@ -42,7 +42,7 @@ static const uint8_t mult_2[256] = {
 		0x5b,0x58,0x5d,0x5e,0x57,0x54,0x51,0x52,0x43,0x40,0x45,0x46,0x4f,0x4c,0x49,0x4a,
 		0x6b,0x68,0x6d,0x6e,0x67,0x64,0x61,0x62,0x73,0x70,0x75,0x76,0x7f,0x7c,0x79,0x7a,
 		0x3b,0x38,0x3d,0x3e,0x37,0x34,0x31,0x32,0x23,0x20,0x25,0x26,0x2f,0x2c,0x29,0x2a,
-		0x0b,0x08,0x0d,0x0e,0x07,0x04,0x01,0x02,0x13,0x10,0x15,0x16,0x1f,0x1c,0x19,0x1a        
+		0x0b,0x08,0x0d,0x0e,0x07,0x04,0x01,0x02,0x13,0x10,0x15,0x16,0x1f,0x1c,0x19,0x1a
     };
 
 	static const uint8_t mult_9[256] = {
@@ -118,7 +118,7 @@ static const uint8_t mult_2[256] = {
 		0xec,0xe2,0xf0,0xfe,0xd4,0xda,0xc8,0xc6,0x9c,0x92,0x80,0x8e,0xa4,0xaa,0xb8,0xb6,
 		0x0c,0x02,0x10,0x1e,0x34,0x3a,0x28,0x26,0x7c,0x72,0x60,0x6e,0x44,0x4a,0x58,0x56,
 		0x37,0x39,0x2b,0x25,0x0f,0x01,0x13,0x1d,0x47,0x49,0x5b,0x55,0x7f,0x71,0x63,0x6d,
-		0xd7,0xd9,0xcb,0xc5,0xef,0xe1,0xf3,0xfd,0xa7,0xa9,0xbb,0xb5,0x9f,0x91,0x83,0x8d	
+		0xd7,0xd9,0xcb,0xc5,0xef,0xe1,0xf3,0xfd,0xa7,0xa9,0xbb,0xb5,0x9f,0x91,0x83,0x8d
 	};
 
 uint8_t EasyWord::get_byte(int index) {
@@ -132,7 +132,7 @@ void EasyWord::set_byte(int index, uint8_t _val) {
     assert(index >= 0 && index <= 3);
     //haha this is pretty much cheating at c++
     uint8_t *byte_ptr = reinterpret_cast<uint8_t *>(&word_);
-    byte_ptr[index] = _val; 
+    byte_ptr[index] = _val;
 }
 
 KeyMaster::KeyMaster(const vector<uint_8t>& _key):
@@ -141,7 +141,7 @@ KeyMaster::KeyMaster(const vector<uint_8t>& _key):
     key_Nr(_key.size() == 16 ? 10:14)
 {
     key_ = new EasyWord[key_Nb * (key_Nr+1)];
-    
+
     //key_schedule algorithm, use first four words to generate the next four
     //repeat until you have enough for every
 
@@ -167,10 +167,10 @@ KeyMaster::KeyMaster(const vector<uint_8t>& _key):
 void KeyMaster::add_four_words(int _ks_idx){
     //run magic function to generate magic word
     uint32_t magic_word = magic(key_[_ks_idx-1].word_, (int)_ks_idx/key_Nb);
-    //add first value	
+    //add first value
     key_[_ks_idx] = key_[_ks_idx-4].word_ ^ magic_word;
     //add second value
-    key_[_ks_idx+1] = key_[_ks_idx].word_ ^ key_[_ks_idx-3].word_;  
+    key_[_ks_idx+1] = key_[_ks_idx].word_ ^ key_[_ks_idx-3].word_;
     //add third value
     key_[_ks_idx+2] = key_[_ks_idx+1].word_ ^ key_[_ks_idx-2].word_;
     //add fourth value
@@ -221,7 +221,7 @@ AES::AES(const vector<uint_8t>& _key):
     Nk_(master_.key_Nk),
     Nr_(master_.key_Nr)
 {
-    key_schedule_ = master_.key_; 
+    key_schedule_ = master_.key_;
 }
 
 void AES::encrypt_this(string _plaintext) {
@@ -351,8 +351,24 @@ void AES::shift_rows() {
   }
 }
 
+//bytes in the last three rows of state_ are shifted by different offsets
+// s0,0   s0,1    s0,2    s0,3           s0,0   s0,1    s0,2    s0,3
+// s1,0   s1,1    s1,2    s1,3    --->   s1,3   s1,0    s1,1    s1,2  (offset 3)
+// s2,0   s2,1    s2,2    s2,3    --->   s2,2   s2,3    s2,0    s2,1  (offset 2)
+// s3,0   s3,1    s3,2    s3,3           s3,1   s3,2    s3,3    s3,0  (offset 1)
+// offset above references offset to left (not inv_shift_rows to the right)
 void AES::inv_shift_rows() {
-
+  uint8_t new_state[4][4] = {
+    {state_[0][0], state_[0][1], state_[0][2], state_[0][3]},
+    {state_[1][3], state_[1][0], state_[1][1], state_[1][2]},
+    {state_[2][2], state_[2][3], state_[2][0], state_[2][1]},
+    {state_[3][1], state_[3][2], state_[3][3], state_[3][0]}
+  };
+  for(int i = 0; i < 4; i++) {
+      for(int j = 0; j < 4; j++) {
+          state_[i][j] = new_state[i][j];
+      }
+  }
 }
 
 void AES::mix_columns() {
@@ -360,10 +376,10 @@ void AES::mix_columns() {
     function<uint8_t(uint8_t)> multiply_2 = [] (uint8_t x) { return mult_2[(int) x]; };
     function<uint8_t(uint8_t)> multiply_3 = [] (uint8_t x) { return mult_3[(int) x]; };
     //given in whitepaper
-    function<uint8_t(uint8_t)> mult_by_mat[4][4] = { 
-        {multiply_2, multiply_3, multiply_1, multiply_1}, 
-        {multiply_1, multiply_2, multiply_3, multiply_1}, 
-        {multiply_1, multiply_1, multiply_2, multiply_3}, 
+    function<uint8_t(uint8_t)> mult_by_mat[4][4] = {
+        {multiply_2, multiply_3, multiply_1, multiply_1},
+        {multiply_1, multiply_2, multiply_3, multiply_1},
+        {multiply_1, multiply_1, multiply_2, multiply_3},
         {multiply_3, multiply_1, multiply_1, multiply_2}
     };
     matrix_multiply(mult_by_mat);
@@ -374,13 +390,13 @@ void AES::inv_mix_columns() {
     function<uint8_t(uint8_t)>  multiply_14 = [] (uint8_t x) { return mult_14[x]; };
     function<uint8_t(uint8_t)>  multiply_11 = [] (uint8_t x) { return mult_11[x]; };
     function<uint8_t(uint8_t)>  multiply_13 = [] (uint8_t x) { return mult_13[x]; };
-    function<uint8_t(uint8_t)> mult_by_mat[4][4] = { 
-        {multiply_14, multiply_11, multiply_13, multiply_9}, 
-        {multiply_9, multiply_14, multiply_11, multiply_13}, 
-        {multiply_13, multiply_9, multiply_14, multiply_11}, 
+    function<uint8_t(uint8_t)> mult_by_mat[4][4] = {
+        {multiply_14, multiply_11, multiply_13, multiply_9},
+        {multiply_9, multiply_14, multiply_11, multiply_13},
+        {multiply_13, multiply_9, multiply_14, multiply_11},
         {multiply_11, multiply_13, multiply_9, multiply_14}
     };
-    matrix_multiply(mult_by_mat);    
+    matrix_multiply(mult_by_mat);
 }
 
 void AES::sub_bytes() {
@@ -408,6 +424,3 @@ vector<uint8_t> AES::state_to_output() {
 
   return output;
 }
-
-
-

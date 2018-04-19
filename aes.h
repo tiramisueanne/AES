@@ -153,7 +153,9 @@ private:
 
     //shift state array rows by different offsets
     void shift_rows();
-    
+
+    //inverse of shift_rows
+    void inv_shift_rows();
 
     void matrix_multiply(function<uint8_t(uint8_t)> matrix[4][4]);
 
@@ -163,9 +165,6 @@ private:
     //The inverse of mix_columns
     void inv_mix_columns();
 
-    //inverse of shift_rows
-    void inv_shift_rows();
-
     //utilize S-box to change state bytes
     void sub_bytes();
 
@@ -174,6 +173,6 @@ private:
 
     //moves ((block length) / 32) bytes of state array to output
     vector<uint8_t> state_to_output();
-    
-        
+
+
 };
