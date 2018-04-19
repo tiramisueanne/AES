@@ -310,6 +310,8 @@ void AES::encrypt_this(string _plaintext) {
       //put block in state
       input_to_state(block);
 
+      add_round_key(master_.get_round_key());
+
       for (int j = 0; j < master_.get_num_rounds() - 1; j++) {
         sub_bytes();
         shift_rows();
@@ -329,7 +331,37 @@ void AES::encrypt_this(string _plaintext) {
 }
 
 void AES::decrypt_this(string _ciphertext) {
+  vector<uint8_t> _vectortext(_ciphertext.begin(), _ciphertext.end());
+  vector<uint8_t> _outputtext;
 
+  //for each 128b block (16 * 8b)
+  for (uint32_t i = 0; i < _vectortext.size(); i += 16) {
+    //get (16 * 8b) block
+    vector<uint8_t> block;
+    for (uint8_t j = 0; j < 16; j++) {
+      block.push_back(_vectortext[i + j]);
+    }
+    //put block in state
+    input_to_state(block);
+
+    add_round_key(master_.get_round_key());
+
+    for (int j = 0; j < master_.get_num_rounds() - 1; j++) {
+      inv_shift_rows();
+      inv_sub_bytes();
+      add_round_key(master_.get_round_key());
+      inv_mix_columns();
+    }
+
+    inv_shift_rows();
+    inv_sub_bytes();
+    add_round_key(master_.get_round_key());
+
+    vector<uint8_t> block_output = state_to_output();
+    for (uint8_t j = 0; j < block_output.size(); j++) {
+      _outputtext.push_back(block_output[j]);
+    }
+  }
 }
 
 void AES::input_to_state(const vector<uint_8t>& _input) {
@@ -379,6 +411,10 @@ void AES::shift_rows() {
   }
 }
 
+void AES::inv_shift_rows() {
+
+}
+
 void AES::mix_columns() {
     function<uint8_t(uint8_t)>  multiply_1 = [] (uint8_t x) { return x; };
     function<uint8_t(uint8_t)> multiply_2 = [] (uint8_t x) { return mult_2[(int) x]; };
@@ -416,6 +452,10 @@ void AES::sub_bytes() {
             state_[i][j] = S_TABLE[index];
         }
     }
+}
+
+void AES::inv_sub_bytes() {
+
 }
 
 vector<uint8_t> AES::state_to_output() {
