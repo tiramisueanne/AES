@@ -13,18 +13,46 @@ uint8_t EasyWord::get_byte(int index) {
     return  byte_ptr[index];
 }
 
-//key size is either 128b or 256b
-//  divided into 8b chunks (in the vector)
-//  size of the vector is either 16b or 32b
-//  thus, Nk - the key length in words - is either 4 (16b / 4) or 8 (32b / 4)
-KeyMaster::KeyMaster(const vector<uint_8t>& _key) : key_size_Nk_(_key.size()/4) {
-    //Key expansion algorithm
-    uint_32t word;
-    int i = 0;
-    while(i < key_size_Nk_) {
+KeyMaster::KeyMaster(const vector<uint_8t>& _key):
+    key_Nb(4),
+    key_Nk(_key.size()/key_Nb),
+    key_Nr(_key.size() == 16 ? 10:14) {
+    key_schedule = new uint32_t[key_Nb * (key_Nr+1)];
 
+    //key_schedule algorithm, use first four words to generate the next four
+    //repeat until you have enough for every
+
+    //transfer the first four words of the key to the schedule
+    for(int i = 0; i < key_Nb; i++){
+        uint_8t new_word[4];
+        uint32_t word_to_put;
+        for(int j = 0; j < 4; j++) {
+            new_word[j] = _key[i*4 + j];
+        }
+        //this is a very dangerous thing to do, but
+        //it would be how do.
+        uint32_t *scary_ptr = reinterpret_cast<uint32_t*>(new_word);
+	    key_schedule[i] =  *scary_ptr;
     }
+
+    //add remaining blocks of four words to key schedule
+    for(int i = 0; i < key_Nr; i++) {
+	    add_four_words((i+1)*4);
+    }
+
 }
+//adds four new words to the key_schedule using the previous four
+void KeyMaster::add_four_words(int _ks_idx){
+    //run magic function to generate magic word
+    uint32_t magic_word = magic(key_schedule[_ks_idx-1], (int)_ks_idx/key_Nb);
+    //add first value
+    key_schedule[_ks_idx] = key_schedule[_ks_idx-4] ^ magic_word;
+    //add second value
+    key_schedule[_ks_idx+1] = key_schedule[_ks_idx] ^ key_schedule[_ks_idx-3];
+    //add third value
+    key_schedule[_ks_idx+2] = key_schedule[_ks_idx+1] ^ key_schedule[_ks_idx-2];
+    //add fourth value
+    key_schedule[_ks_idx+3] = key_schedule[_ks_idx+2] ^ key_schedule[_ks_idx-1];
 
 int KeyMaster::get_num_rounds() {
   switch(key_size_Nk_) {
@@ -34,16 +62,48 @@ int KeyMaster::get_num_rounds() {
   }
 }
 
-uint32_t KeyMaster::get_round_key() {
-    return 42;
+//magic function to calculate first word per round
+uint32_t KeyMaster::magic(uint32_t _word, int _round) {
+    uint32_t current_word = _word;
+
+    current_word = rotate_word(current_word);
+    current_word = sub_word(current_word);
+    //xor leftmost byte with precomputed ROUND_CONSTANT value
+    uint32_t round_const = (ROUND_CONSTANT[_round] << 24);
+    current_word = current_word ^ round_const;
+
+    return current_word;
 }
 
+//move leftmost byte to become the rightmost byte
 uint32_t KeyMaster::rotate_word(uint32_t _word) {
-    return 42;
+    uint8_t rotated_word[4];
+    uint8_t* byte_pointer = (uint8_t*) &_word;
+    rotated_word[0] = byte_pointer[1];
+    rotated_word[1] = byte_pointer[2];
+    rotated_word[2] = byte_pointer[3];
+    rotated_word[3] = byte_pointer[0];
+    return *(reinterpret_cast<uint32_t *>(rotated_word));
 }
 
-AES::AES(const vector<uint_8t>& _key): master_(_key){
+//perform simple s-box substitution
+uint32_t KeyMaster::sub_word(uint32_t _word) {
+    uint8_t subbed_word[4];
+    uint8_t* byte_pointer = (uint8_t*) &_word;
+    for(int i = 0; i < 4; i++){
+        subbed_word[i] = S_TABLE[byte_pointer[i]];
+    }
+    return *(reinterpret_cast<uint32_t *>(subbed_word));
 
+}
+
+AES::AES(const vector<uint_8t>& _key):
+    master_(_key),
+    Nb_(master_.key_Nb),
+    Nk_(master_.key_Nk),
+    Nr_(master_.key_Nr)
+{
+    key_schedule_ = master_.key_schedule;
 }
 
 void AES::encrypt_this(string _plaintext) {
