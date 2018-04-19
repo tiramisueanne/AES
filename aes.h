@@ -99,9 +99,7 @@ private:
     //The inverse of mix_columns
     void inv_mix_columns();
 
-    //inverse of shift_rows
-    void inv_shift_rows();
-
+    
     //utilize S-box to change state bytes
     void sub_bytes();
 
