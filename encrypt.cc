@@ -1,6 +1,10 @@
 #include <iostream>
+#include <string>
 #include "aes.h"
 
 int main() {
-    cout << "We could encrypt things here" << endl;    
+    cout << "Input textfile to encrypt: " << endl;
+    string textfile;
+    cin >> textfile;
+    cout << textfile << endl;
 }
