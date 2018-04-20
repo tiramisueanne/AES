@@ -42,16 +42,16 @@ private:
     EasyWord* key_schedule_;
 
     //move leftmost byte to become the rightmost byte
-    uint32_t rotate_word(uint32_t _word);
+    uint32_t rotate_word(EasyWord _word);
 
     //perform simple s-box substitution
-    uint32_t sub_word(uint32_t _word);
+    uint32_t sub_word(EasyWord _word);
 
     //adds four new words to the key_schedule using the previous four
     void add_four_words(int _ks_idx);
 
     //magic function to calculate the first word per round
-    uint32_t magic(uint32_t _word, int _round);
+    uint32_t magic(EasyWord _word, int _round);
 };
 
 class AES {

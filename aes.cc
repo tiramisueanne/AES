@@ -216,7 +216,7 @@ KeyMaster::KeyMaster(const vector<uint_8t>& _key):
     //transfer the first four words of the key to the schedule
     for(int i = 0; i < 4; i++){
         for(int j = 0; j < 4; j++) {
-            key_schedule_[i].set
+            key_schedule_[i].set_byte(j, _key[i*4 + j]);
         }
     } 
 
@@ -229,49 +229,43 @@ KeyMaster::KeyMaster(const vector<uint_8t>& _key):
 //adds four new words to the key_schedule using the previous four
 void KeyMaster::add_four_words(int _ks_idx){
     //run magic function to generate magic word
-    uint32_t magic_word = magic(key_schedule_[_ks_idx-1].word_, (int)_ks_idx/key_Nb);
+    uint32_t magic_word = magic(key_schedule_[_ks_idx-1], (int)_ks_idx/key_Nb);
     //add first value	
-    key_schedule_[_ks_idx] = key_schedule_[_ks_idx-4].word_ ^ magic_word;
+    key_schedule_[_ks_idx] = key_schedule_[_ks_idx-4] ^ magic_word;
     //add second value
-    key_schedule_[_ks_idx+1] = key_schedule_[_ks_idx].word_ ^ key_schedule_[_ks_idx-3].word_;  
+    key_schedule_[_ks_idx+1] = key_schedule_[_ks_idx] ^ key_schedule_[_ks_idx-3]; 
     //add third value
-    key_schedule_[_ks_idx+2] = key_schedule_[_ks_idx+1].word_ ^ key_schedule_[_ks_idx-2].word_;
+    key_schedule_[_ks_idx+2] = key_schedule_[_ks_idx+1] ^ key_schedule_[_ks_idx-2];
     //add fourth value
-    key_schedule_[_ks_idx+3] = key_schedule_[_ks_idx+2].word_ ^ key_schedule_[_ks_idx-1].word_;
+    key_schedule_[_ks_idx+3] = key_schedule_[_ks_idx+2] ^ key_schedule_[_ks_idx-1];
 }
 
 
-uint32_t KeyMaster::magic(uint32_t _word, int _round) {
-    uint32_t current_word = _word;
-
-    current_word = rotate_word(current_word);
-    current_word = sub_word(current_word);
+uint32_t KeyMaster::magic(EasyWord _word, int _round) {
+    _word = rotate_word(_word);
+    _word = sub_word(_word);
     //xor leftmost byte with precomputed ROUND_CONSTANT value
     uint32_t round_const = (ROUND_CONSTANT[_round] << 24);
-    current_word = current_word ^ round_const;
-
-    return current_word;
+    _word = _word ^ round_const;
+    return _word;
 }
 
 //move leftmost byte to become the rightmost byte
-uint32_t KeyMaster::rotate_word(uint32_t _word) {
-    uint8_t rotated_word[4];
-    uint8_t* byte_pointer = (uint8_t*) &_word;
-    rotated_word[0] = byte_pointer[1];
-    rotated_word[1] = byte_pointer[2];
-    rotated_word[2] = byte_pointer[3];
-    rotated_word[3] = byte_pointer[0];
-    return *(reinterpret_cast<uint32_t *>(rotated_word));
+uint32_t KeyMaster::rotate_word(EasyWord _word) {
+    uint8_t first_byte = _word.get_byte(0);
+    _word.set_byte(0, _word.get_byte(1));
+    _word.set_byte(1, _word.get_byte(2));
+    _word.set_byte(2, _word.get_byte(3));
+    _word.set_byte(3, first_byte);
+    return _word;
 }
 
 //perform simple s-box substitution
-uint32_t KeyMaster::sub_word(uint32_t _word) {
-    uint8_t subbed_word[4];
-    uint8_t* byte_pointer = (uint8_t*) &_word;
+uint32_t KeyMaster::sub_word(EasyWord _word) {
     for(int i = 0; i < 4; i++){
-        subbed_word[i] = S_TABLE[byte_pointer[i]];
+        _word.set_bit(i, S_TABLE[_word.get_byte(i)]);
     }
-    return *(reinterpret_cast<uint32_t *>(subbed_word));
+    return _word; 
 }
 
 uint32_t KeyMaster::get_round_key() {
