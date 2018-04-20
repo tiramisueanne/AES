@@ -76,7 +76,6 @@ private:
     const size_t Nb_;
     const size_t Nk_;
     const size_t Nr_;
-    EasyWord* key_schedule_;
     uint8_t state_[4][4];
 
     //moves ((block length) / 32) bytes of input into state array

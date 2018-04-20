@@ -285,7 +285,6 @@ AES::AES(const vector<uint_8t>& _key):
     Nk_(master_.key_Nk),
     Nr_(master_.key_Nr)
 {
-    key_schedule_ = master_.key_; 
 }
 
 void AES::encrypt_this(string _plaintext) {
@@ -468,6 +467,4 @@ vector<uint8_t> AES::state_to_output() {
 
   return output;
 }
-
-
 
