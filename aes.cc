@@ -329,6 +329,7 @@ void AES::encrypt_this(string _plaintext) {
     }
 }
 
+//
 void AES::decrypt_this(string _ciphertext) {
   vector<uint8_t> _vectortext(_ciphertext.begin(), _ciphertext.end());
   vector<uint8_t> _outputtext;
@@ -454,7 +455,12 @@ void AES::sub_bytes() {
 }
 
 void AES::inv_sub_bytes() {
-
+   for(int i = 0; i < 4; i++) {
+        for(int j = 0; j < 4; j++) {
+            int index = static_cast<int>(state_[i][j]);
+            state_[i][j] = S_TABLE[index];
+        }
+   }       
 }
 
 vector<uint8_t> AES::state_to_output() {

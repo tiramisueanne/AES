@@ -102,7 +102,6 @@ private:
     //utilize S-box to change state bytes
     void sub_bytes();
 
-    //inverse of sub_bytes
     void inv_sub_bytes();
 
     //moves ((block length) / 32) bytes of state array to output
