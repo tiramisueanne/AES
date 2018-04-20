@@ -15,7 +15,7 @@ class EasyWord {
 public:
     EasyWord() {};
     EasyWord(uint32_t _word): word_(_word) {};
-    EasyWord& operator=(uint32_t _word){ word_ = _word; };
+    EasyWord& operator=(uint32_t _word){ word_ = _word; return *this;};
     operator uint32_t() const { return word_; };
     uint8_t get_byte(int index);
     void set_byte(int index, uint8_t _val);
@@ -56,7 +56,7 @@ private:
 class AES {
 
 public:
-    AES(const vector<uint_8>& _key): master_(_key) {};
+    AES(const vector<uint8_t>& _key): master_(_key) {};
 
     // round function -
     //    for each block of set size
@@ -85,9 +85,6 @@ private:
 
     //shift state array rows by different offsets
     void shift_rows();
-
-    //shift state array rows but backward
-    void inv_shift_rows();
 
     void matrix_multiply(function<uint8_t(uint8_t)> matrix[4][4]);
 

@@ -227,7 +227,7 @@ KeyMaster::KeyMaster(const vector<uint_8t>& _key):
 //get the next word in the key schedule
 uint32_t KeyMaster::get_next_word() {
     uint32_t next_word = key_schedule_[0];
-    key_schedule_ = key_schedule[1];
+    key_schedule_ = &key_schedule_[1];
     return next_word;
 }
 
@@ -244,7 +244,7 @@ uint32_t KeyMaster::rotate_word(EasyWord _word) {
 //perform simple s-box substitution
 uint32_t KeyMaster::sub_word(EasyWord _word) {
     for(int i = 0; i < 4; i++){
-        _word.set_bit(i, S_TABLE[_word.get_byte(i)]);
+        _word.set_byte(i, S_TABLE[_word.get_byte(i)]);
     }
     return _word; 
 }
@@ -360,8 +360,8 @@ void AES::input_to_state(const vector<uint_8t>& _input) {
 void AES::add_round_key() {
     for(int word = 0; word < 4; word++){
         EasyWord next_word = master_.get_next_word();
-        for(byte = 0; byte < 4; byte++){
-            state[byte][word] = state[byte][word] ^ next_word.get_byte(byte);
+        for(int byte = 0; byte < 4; byte++){
+            state_[byte][word] = state_[byte][word] ^ next_word.get_byte(byte);
         }
     } 
 }
