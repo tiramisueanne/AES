@@ -11,6 +11,7 @@ typedef unsigned int uint_32t;
 //this is the number of words in each round key
 //allows for easy access into a uint32_t
 class EasyWord {
+
 public:
     EasyWord() {};
     EasyWord(uint32_t _word): word_(_word) {};
@@ -22,7 +23,6 @@ private:
     uint32_t word_;
 };
 
-//could possibly use with EasyWord but it was too much work
 class KeyMaster {
 public:
     KeyMaster(const vector<uint_8t>& _key);
