@@ -26,10 +26,10 @@ private:
 class KeyMaster {
 public:
     KeyMaster(const vector<uint_8t>& _key);
-
+    //return the total number of rounds, 10 for 128 bit key, 14 for 256 bit
     int get_num_rounds() { return key_Nr; };
-
-    uint32_t get_round_key();
+    //get the next word in the key schedule
+    uint32_t get_next_word();
 
 private:
     //number of rounds ( 128 bit - 10 | 256 bit - 14 )
@@ -40,7 +40,6 @@ private:
     const size_t key_Nk;
     //linear array of EasyWords, 4 for the start plus 4 for each round
     EasyWord* key_schedule_;
-
     //move leftmost byte to become the rightmost byte
     uint32_t rotate_word(EasyWord _word);
 
@@ -56,10 +55,8 @@ private:
 
 class AES {
 
-AES(const vector<uint_8>& _key): master_(_key) {};
-
 public:
-    AES(const vector<uint_8t>& _key);
+    AES(const vector<uint_8>& _key): master_(_key) {};
 
     // round function -
     //    for each block of set size
@@ -69,6 +66,7 @@ public:
     //        2. shift rows of state_ array by different outsets (shift_rows)
     //        3. mix data within each column of the state_ array (mix_columns)
     //        4. add round Key to State (from KeyMaster::get_round_key)
+
     void encrypt_this(string _plaintext);
 
     void decrypt_this(string _ciphertext);
@@ -83,7 +81,7 @@ private:
     void input_to_state(const vector<uint8_t>& input);
 
     //Round key is added to the state
-    void add_round_key(uint32_t _word);
+    void add_round_key();
 
     //shift state array rows by different offsets
     void shift_rows();

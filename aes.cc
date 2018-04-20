@@ -7,7 +7,6 @@
 
 #include "aes.h"
 using namespace std;
-const int NB =4;
 
 const uint8_t S_TABLE[256] =
     {
@@ -209,7 +208,6 @@ KeyMaster::KeyMaster(const vector<uint_8t>& _key):
     key_Nr(_key.size() == 16 ? 10:14)
 {
     key_schedule_ = new EasyWord[key_Nb * (key_Nr+1)];
- 
     //key_schedule algorithm, use first four words to generate the next four
     //repeat until you have enough for every
 
@@ -224,30 +222,13 @@ KeyMaster::KeyMaster(const vector<uint_8t>& _key):
     for(int i = 0; i < key_Nr; i++) {
         add_four_words((i+1)*4);
     }
-
-}
-//adds four new words to the key_schedule using the previous four
-void KeyMaster::add_four_words(int _ks_idx){
-    //run magic function to generate magic word
-    uint32_t magic_word = magic(key_schedule_[_ks_idx-1], (int)_ks_idx/key_Nb);
-    //add first value	
-    key_schedule_[_ks_idx] = key_schedule_[_ks_idx-4] ^ magic_word;
-    //add second value
-    key_schedule_[_ks_idx+1] = key_schedule_[_ks_idx] ^ key_schedule_[_ks_idx-3]; 
-    //add third value
-    key_schedule_[_ks_idx+2] = key_schedule_[_ks_idx+1] ^ key_schedule_[_ks_idx-2];
-    //add fourth value
-    key_schedule_[_ks_idx+3] = key_schedule_[_ks_idx+2] ^ key_schedule_[_ks_idx-1];
 }
 
-
-uint32_t KeyMaster::magic(EasyWord _word, int _round) {
-    _word = rotate_word(_word);
-    _word = sub_word(_word);
-    //xor leftmost byte with precomputed ROUND_CONSTANT value
-    uint32_t round_const = (ROUND_CONSTANT[_round] << 24);
-    _word = _word ^ round_const;
-    return _word;
+//get the next word in the key schedule
+uint32_t KeyMaster::get_next_word() {
+    uint32_t next_word = key_schedule_[0];
+    key_schedule_ = key_schedule[1];
+    return next_word;
 }
 
 //move leftmost byte to become the rightmost byte
@@ -268,11 +249,29 @@ uint32_t KeyMaster::sub_word(EasyWord _word) {
     return _word; 
 }
 
-uint32_t KeyMaster::get_round_key() {
-    return 42;
+//adds four new words to the key_schedule using the previous four
+void KeyMaster::add_four_words(int _ks_idx){
+    //run magic function to generate magic word
+    uint32_t magic_word = magic(key_schedule_[_ks_idx-1], (int)_ks_idx/key_Nb);
+    //add first value	
+    key_schedule_[_ks_idx] = key_schedule_[_ks_idx-4] ^ magic_word;
+    //add second value
+    key_schedule_[_ks_idx+1] = key_schedule_[_ks_idx] ^ key_schedule_[_ks_idx-3]; 
+    //add third value
+    key_schedule_[_ks_idx+2] = key_schedule_[_ks_idx+1] ^ key_schedule_[_ks_idx-2];
+    //add fourth value
+    key_schedule_[_ks_idx+3] = key_schedule_[_ks_idx+2] ^ key_schedule_[_ks_idx-1];
 }
 
-AES::AES(const vector<uint_8t>& _key): master_(_key) {};
+//magic function to calculate the first word per round
+uint32_t KeyMaster::magic(EasyWord _word, int _round) {
+    _word = rotate_word(_word);
+    _word = sub_word(_word);
+    //xor leftmost byte with precomputed ROUND_CONSTANT value
+    uint32_t round_const = (ROUND_CONSTANT[_round] << 24);
+    _word = _word ^ round_const;
+    return _word;
+}
 
 void AES::encrypt_this(string _plaintext) {
     vector<uint8_t> _vectortext(_plaintext.begin(), _plaintext.end());
@@ -283,7 +282,7 @@ void AES::encrypt_this(string _plaintext) {
     //pad end with 0s
     uint8_t to_pad = 16 - (_vectortext.size() % 16);
     for (uint8_t i = 0; i < to_pad; i++) {
-      _vectortext.push_back(0);
+        _vectortext.push_back(0);
     }
 
     //for each 128b block (16 * 8b)
@@ -291,23 +290,23 @@ void AES::encrypt_this(string _plaintext) {
       //get (16 * 8b) block
       vector<uint8_t> block;
       for (uint8_t j = 0; j < 16; j++) {
-        block.push_back(_vectortext[i + j]);
+         block.push_back(_vectortext[i + j]);
       }
       //put block in state
       input_to_state(block);
 
-      add_round_key(master_.get_round_key());
+      add_round_key();
 
       for (int j = 0; j < master_.get_num_rounds() - 1; j++) {
         sub_bytes();
         shift_rows();
         mix_columns();
-        add_round_key(master_.get_round_key());
+        add_round_key();
       }
 
       sub_bytes();
       shift_rows();
-      add_round_key(master_.get_round_key());
+      add_round_key();
 
       vector<uint8_t> block_output = state_to_output();
       for (uint8_t j = 0; j < block_output.size(); j++) {
@@ -330,18 +329,18 @@ void AES::decrypt_this(string _ciphertext) {
     //put block in state
     input_to_state(block);
 
-    add_round_key(master_.get_round_key());
+    add_round_key();
 
     for (int j = 0; j < master_.get_num_rounds() - 1; j++) {
       inv_shift_rows();
       inv_sub_bytes();
-      add_round_key(master_.get_round_key());
+      add_round_key();
       inv_mix_columns();
     }
 
     inv_shift_rows();
     inv_sub_bytes();
-    add_round_key(master_.get_round_key());
+    add_round_key();
 
     vector<uint8_t> block_output = state_to_output();
     for (uint8_t j = 0; j < block_output.size(); j++) {
@@ -358,8 +357,13 @@ void AES::input_to_state(const vector<uint_8t>& _input) {
   }
 }
 
-void AES::add_round_key(uint32_t _word) {
-
+void AES::add_round_key() {
+    for(int word = 0; word < 4; word++){
+        EasyWord next_word = master_.get_next_word();
+        for(byte = 0; byte < 4; byte++){
+            state[byte][word] = state[byte][word] ^ next_word.get_byte(byte);
+        }
+    } 
 }
 
 void AES::matrix_multiply(function<uint8_t(uint8_t)> matrix[4][4]) {
