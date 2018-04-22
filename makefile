@@ -4,16 +4,15 @@ BASE=$(subst test.cc, ,$(SOURCE))
 EXEC=tui
 
 # type in "make run" to run the program
-run: $(EXEC)
+run: $(BASE)
 	g++ -std=c++14 $(BASE) -o $(EXEC)
 	./$(EXEC)
-	clean
 
 # type in "test" to run all unit tests
-test:
+test: $(TESTING)
 	g++ -std=c++14 $(TESTING) -o test -lgtest -lgtest_main -pthread
-	./test	
+	./test
 
 #type in "clean" to get rid of all executables
 clean:
-	rm $(TARGET) test
+	rm -f $(EXEC) test
