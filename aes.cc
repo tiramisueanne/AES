@@ -2,6 +2,7 @@
 #include <cmath>
 #include <functional>
 #include <iostream>
+#include <iomanip>
 #include <stdint.h>
 #include <vector>
 
@@ -312,10 +313,13 @@ void AES::encrypt_this(string _plaintext) {
       vector<uint8_t> block_output = state_to_output();
       for (uint8_t j = 0; j < block_output.size(); j++) {
         _outputtext.push_back(block_output[j]);
+        cout << hex << setfill('0') << setw(2) << (int) block_output[j] << " ";
       }
+      cout << endl;
     }
 }
 
+//
 void AES::decrypt_this(string _ciphertext) {
   vector<uint8_t> _vectortext(_ciphertext.begin(), _ciphertext.end());
   vector<uint8_t> _outputtext;
@@ -346,6 +350,7 @@ void AES::decrypt_this(string _ciphertext) {
     vector<uint8_t> block_output = state_to_output();
     for (uint8_t j = 0; j < block_output.size(); j++) {
       _outputtext.push_back(block_output[j]);
+      cout << block_output[j];
     }
   }
 }
@@ -462,7 +467,12 @@ void AES::sub_bytes() {
 }
 
 void AES::inv_sub_bytes() {
-
+   for(int i = 0; i < 4; i++) {
+        for(int j = 0; j < 4; j++) {
+            int index = static_cast<int>(state_[i][j]);
+            state_[i][j] = S_TABLE[index];
+        }
+   }       
 }
 
 vector<uint8_t> AES::state_to_output() {
@@ -475,3 +485,4 @@ vector<uint8_t> AES::state_to_output() {
 
   return output;
 }
+
