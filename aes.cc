@@ -275,8 +275,7 @@ uint32_t KeyMaster::magic(EasyWord _word, int _round) {
     return _word;
 }
 
-void AES::encrypt_this(string _plaintext) {
-    vector<uint8_t> _vectortext(_plaintext.begin(), _plaintext.end());
+vector<uint8_t> AES::encrypt_this(vector<uint8_t> _vectortext) {
     vector<uint8_t> _outputtext;
 
     //if _plaintext size is not evenly divisible by 16
@@ -313,15 +312,12 @@ void AES::encrypt_this(string _plaintext) {
       vector<uint8_t> block_output = state_to_output();
       for (uint8_t j = 0; j < block_output.size(); j++) {
         _outputtext.push_back(block_output[j]);
-        cout << hex << setfill('0') << setw(2) << (int) block_output[j] << " ";
       }
-      cout << endl;
     }
+    return _outputtext;
 }
 
-//
-void AES::decrypt_this(string _ciphertext) {
-  vector<uint8_t> _vectortext(_ciphertext.begin(), _ciphertext.end());
+vector<uint8_t> AES::decrypt_this(vector<uint8_t> _vectortext) {
   vector<uint8_t> _outputtext;
 
   //for each 128b block (16 * 8b)
