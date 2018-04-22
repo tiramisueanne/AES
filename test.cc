@@ -1,11 +1,17 @@
 #include "gtest/gtest.h"
-
 #include "aes.h"
+#include <vector>
+
 using namespace std;
 
-TEST(EncryptSuite, zeroth_round{
+TEST(EncryptSuite, ZerothRound){
+    EXPECT_EQ(1,1); 
 }
 
-TEST(EncryptSuite, first_round) {
+TEST(EncryptSuite, FirstRound) {
+    EXPECT_EQ(1,1);
 }
 
+TEST(KeyMasterTest, PlaceholderTest){
+    EXPECT_EQ(1,1);
+}

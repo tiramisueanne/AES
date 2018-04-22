@@ -204,7 +204,7 @@ void EasyWord::set_byte(int index, uint8_t _val) {
     byte_ptr[index] = _val;
 }
 
-KeyMaster::KeyMaster(const vector<uint_8t>& _key):
+KeyMaster::KeyMaster(const vector<uint8_t>& _key):
     key_Nb(4),
     key_Nk(_key.size()/key_Nb),
     key_Nr(_key.size() == 16 ? 10:14)
@@ -351,7 +351,7 @@ vector<uint8_t> AES::decrypt_this(vector<uint8_t> &_vectortext) {
   }
 }
 
-void AES::input_to_state(const vector<uint_8t>& _input) {
+void AES::input_to_state(const vector<uint8_t>& _input) {
   for (uint8_t r = 0; r < 4; r++) {
     for (uint8_t c = 0; c < 4; c++) {
       state_[r][c] = _input[r + 4 * c];
