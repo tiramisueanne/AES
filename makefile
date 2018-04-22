@@ -1,12 +1,12 @@
 SOURCE=$(wildcard *.cc)
 TESTING=$(subst encrypt.cc, , $(SOURCE))
 BASE=$(subst test.cc, ,$(SOURCE))
-TARGET=tui
+EXEC=tui
 
 # type in "make run" to run the program
-run: $(TARGET)
-	g++ -std=c++14 $(BASE) -o $(TARGET)
-	./$(TARGET)
+run: $(EXEC)
+	g++ -std=c++14 $(BASE) -o $(EXEC)
+	./$(EXEC)
 	clean
 
 # type in "test" to run all unit tests
