@@ -67,9 +67,9 @@ public:
     //        3. mix data within each column of the state_ array (mix_columns)
     //        4. add round Key to State (from KeyMaster::get_round_key)
 
-    vector<uint8_t> encrypt_this(vector<uint8_t> _vectortext);
+    vector<uint8_t> encrypt_this(vector<uint8_t> &_vectortext);
 
-    vector<uint8_t> decrypt_this(vector<uint8_t> _vectortext);
+    vector<uint8_t> decrypt_this(vector<uint8_t> &_vectortext);
 
 private:
 
