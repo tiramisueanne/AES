@@ -32,7 +32,7 @@ void bytes_to_output(const vector<uint8_t> &bytes, ostream& oss) {
 
 using namespace std;
 int main() {
-    ifstream key_file("aes_canvas_128");
+    ifstream key_file("key_128");
     stringstream ss;
     string line;
     vector<uint8_t> bytes;

@@ -5,9 +5,6 @@
 #include <vector>
 using namespace std;
 
-typedef unsigned char uint_8t;
-typedef unsigned int uint_32t;
-
 //this is the number of words in each round key
 //allows for easy access into a uint32_t
 class EasyWord {
@@ -25,7 +22,7 @@ private:
 
 class KeyMaster {
 public:
-    KeyMaster(const vector<uint_8t>& _key);
+    KeyMaster(const vector<uint8_t>& _key);
     //return the total number of rounds, 10 for 128 bit key, 14 for 256 bit
     int get_num_rounds() { return key_Nr; };
     //get the next word in the key schedule
