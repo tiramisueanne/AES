@@ -7,7 +7,6 @@ EXEC=tui
 run: $(EXEC)
 	g++ -std=c++14 $(BASE) -o $(EXEC)
 	./$(EXEC)
-	clean
 
 # type in "test" to run all unit tests
 test:

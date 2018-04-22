@@ -26,13 +26,13 @@ vector<uint8_t> byte_vector(string line) {
 void bytes_to_output(const vector<uint8_t> &bytes, ostream& oss) {
     for(int i = 0; i < bytes.size(); i++) {
         uint8_t byte = bytes[i];
-        oss << hex << byte; 
+        oss << hex << (int) byte; 
     }
 }
 
 using namespace std;
 int main() {
-    ifstream key_file("aes_doc_256");
+    ifstream key_file("aes_canvas_128");
     stringstream ss;
     string line;
     vector<uint8_t> bytes;
