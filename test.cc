@@ -18,6 +18,7 @@ TEST(StringToByteVectorTest, CharCompare) {
 TEST(StringToByteVectorTest, CStrCompare) {
   char const* sample = "Thats my Kung Fu";
   vector<uint8_t> from_string = string_to_byte_vector(string(sample));
+  from_string.push_back('\0');
   ASSERT_STREQ((char const*)from_string.data(), sample);
 }
 
