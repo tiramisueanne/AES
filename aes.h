@@ -68,9 +68,9 @@ public:
   //        3. mix data within each column of the state_ array (mix_columns)
   //        4. add round Key to State (from KeyMaster::get_round_key)
 
-  vector<uint8_t> encrypt_this(const vector<uint8_t> &_vectortext);
+  vector<uint8_t> encrypt_this(vector<uint8_t> &_vectortext);
 
-  vector<uint8_t> decrypt_this(const vector<uint8_t> &_vectortext);
+  vector<uint8_t> decrypt_this(vector<uint8_t> &_vectortext);
 
 private:
   // oooooh goodness me
@@ -78,7 +78,7 @@ private:
   uint8_t state_[4][4];
 
   // moves ((block length) / 32) bytes of input into state array
-  void input_to_state(const vector<uint8_t> input);
+  void input_to_state(const vector<uint8_t> &_input);
 
   // Round key is added to the state
   void add_round_key();

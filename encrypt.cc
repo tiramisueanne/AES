@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
     output = aes_machine.decrypt_this(input);
   }
   else {
-    cout << "Invalid Mode, Please type \"encrypt\" or \"decrypt\"";
+    cout << "Invalid Mode, Please type \"encrypt\" or \"decrypt\"" << endl;
     exit(1);
   }
 
