@@ -350,6 +350,10 @@ void KeyMaster::add_four_words(int _ks_idx) {
       key_schedule_[_ks_idx + 2] ^ key_schedule_[_ks_idx - 1];
 }
 
+void KeyMaster::add_eight_words(int _ks_idx) {
+
+}
+
 // magic function to calculate the first word per round
 uint32_t KeyMaster::magic(EasyWord _word, int _round) {
   _word = rotate_word(_word);
@@ -434,6 +438,7 @@ vector<uint8_t> AES::decrypt_this(vector<uint8_t> &_vectortext) {
       cout << block_output[j];
     }
   }
+  return _outputtext;
 }
 
 void AES::input_to_state(const vector<uint8_t> &_input) {

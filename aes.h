@@ -59,6 +59,8 @@ private:
 
   // adds four new words to the key_schedule using the previous four
   void add_four_words(int _ks_idx);
+ 
+  void add_eight_words(int _ks_idx);
 
   // magic function to calculate the first word per round
   uint32_t magic(EasyWord _word, int _round);
