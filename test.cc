@@ -1,6 +1,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <bitset>
 #include "gtest/gtest.h"
 #include "aes.h"
 
@@ -32,4 +33,44 @@ TEST(HexString, ByteHex){
     0x34,0xA9,0x18,0x7F,0xF3,0xE8,0x88,0x32,0x6E,0xBA};
   string expected = "4b95c5d3ab2834a9187ff3e888326eba";
   ASSERT_EQ(hex_string(byte_vector), expected);
+}
+
+TEST(EasyWord, Casting){
+  EasyWord test = EasyWord(42);
+  ASSERT_EQ(test, 42);
+}
+
+TEST(EasyWord, Assignment){
+  EasyWord test = EasyWord(42);
+  EasyWord test2 = 42;
+  ASSERT_EQ(test, test2);
+}
+
+TEST(EasyWord, GetByte){
+  EasyWord test = 2784128155;
+  // 1010 0101 1111 0010 0110 1100 1001 1011
+
+  EXPECT_EQ(test.get_byte(0), 0b10011011);
+  EXPECT_EQ(test.get_byte(1), 0b01101100);
+  EXPECT_EQ(test.get_byte(2), 0b11110010);
+  EXPECT_EQ(test.get_byte(3), 0b10100101);
+}
+
+TEST(EasyWord, SetByte){
+  EasyWord test = 2784128155;
+  // 1010 0101 1111 0010 0110 1100 1001 1011
+
+  EXPECT_EQ(test, 2784128155);
+  test.set_byte(3, 0b10111011);
+  EXPECT_EQ(test, 3153226907);
+
+  test.set_byte(2, 0);
+  EXPECT_EQ(test, 3137367195);
+
+  test.set_byte(1, 0b11111111);
+  EXPECT_EQ(test, 3137404827);
+
+  test.set_byte(0, 12);
+  EXPECT_EQ(test, 3137404684);
+
 }

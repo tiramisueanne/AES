@@ -246,6 +246,7 @@ string hex_string(const vector<uint8_t> &bytes) {
   return hex_bytes_.str();
 }
 
+// index 0 refers to the rightmost byte, index 3 is leftmost
 uint8_t EasyWord::get_byte(int index) {
   assert(index >= 0 && index <= 3);
   // haha this is pretty much cheating at c++
