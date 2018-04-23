@@ -2,6 +2,7 @@
 #include <string>
 #include <iostream>
 #include <bitset>
+#include <cstdint>
 #include "gtest/gtest.h"
 #include "aes.h"
 
@@ -136,17 +137,18 @@ struct AesTest : testing::Test {
         vector<uint8_t> bytes_;
         for(int i = 0; i <  _hex.size() -1; i+=2) {
            string hex_ = "";
-           hex_ += _hex[i];
-           hex_ += _hex[i+1];
+           hex_ += {_hex[i], _hex[i+1]};
+           //cout << "hex_" << hex_ << endl;
            stringstream ss;
-           ss << hex << hex_;
-           unsigned char x;
-           ss >> x;
-           bytes_.emplace_back(x);
-           cout << hex << x << " ";
+           ss << hex_;
+           int x;
+           ss >> hex >> x;
+           uint8_t to_place = x;
+           bytes_.emplace_back(to_place);
         }
         return bytes_;
     }
+
     static vector<EasyWord> bytes_to_words(vector<uint8_t> bytes_) {
         /*
         vector<EasyWord> _words;
@@ -155,31 +157,36 @@ struct AesTest : testing::Test {
         return vector<EasyWord>();
     }
     virtual void SetUp() {
-        string FIPS_128 = "00112233445566778899aabbccddeeff";
+        string FIPS_128 = "000102030405060708090a0b0c0d0e0f";
         vector<uint8_t> key_128 = string_hex_to_bytes(FIPS_128); 
         machine = new AES(key_128);
     }
 
-    virtual void TearDown() {};
+    virtual void TearDown() {
+        delete machine;
+    };
 };
 
 TEST_F(AesTest, InitState) {
     vector<uint8_t> bytes_ = AesTest::string_hex_to_bytes("00112233445566778899aabbccddeeff"); 
+    machine->input_to_state(bytes_);
     //check and see if state is correct
     for(int col = 0; col < 4; col++) {
         for(int row  = 0; row < 4; row++) {
-            ASSERT_EQ(machine->state_[row][col], bytes_[row + col*4]); 
+            EXPECT_EQ(machine->state_[row][col], bytes_[row + col*4]); 
         }
     }
 }
 
 TEST_F(AesTest, InitKey) { 
-    /*
-vector<uint8_t> key_sch = AesTest::string_hex_to_bytes("000102030405060708090a0b0c0d0e0f");
-    EasyWord next_ = machine->master_.get_next_word();
-    for(int i = 0; i < 4; i++) {
-        ASSERT_EQ(next_, key_[i]); 
-    }
-    */
+    vector<uint8_t> key_sch = AesTest::string_hex_to_bytes("000102030405060708090a0b0c0d0e0f");
+    EasyWord next_word = machine->master_.get_next_word();
+    //Tried indexing descending and ascending and both look wrong sadly
+    EasyWord correct_word = EasyWord(key_sch[0], key_sch[1], key_sch[2], key_sch[3]);  
+    EXPECT_EQ(next_word, correct_word);
+}
+
+TEST_F(AesTest, FirstRound) {
+    vector<uint8_t> key_sch = AesTest::
 }
 

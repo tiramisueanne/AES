@@ -74,7 +74,6 @@ private:
 class AES {
   friend struct AesTest;
   FRIEND_TEST(AesTest, InitState);
-
   FRIEND_TEST(AesTest, InitKey);  
 public:
   AES(const vector<uint8_t> &_key) : master_(_key){};
