@@ -43,6 +43,10 @@ public:
   // get the next word in the key schedule
   uint32_t get_next_word();
 
+  ~KeyMaster() {
+    delete []  key_schedule_;
+  };
+
 private:
   // number of rounds ( 128 bit - 10 | 256 bit - 14 )
   const size_t key_Nr;

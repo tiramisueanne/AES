@@ -9,9 +9,10 @@ EXEC=aes
 all: $(BASE)
 	g++ -std=c++14 $(BASE) -o $(EXEC)
 
+.PRECIOUS: test
 # type in "make test" to run all unit tests
 test: $(TESTING)
-	g++ -std=c++14 $(TESTING) -o test -lgtest -lgtest_main -pthread
+	g++ -std=c++14 -g $(TESTING) -o test -lgtest -lgtest_main -pthread
 	./test
 
 # type in "clean" to get rid of all executables
