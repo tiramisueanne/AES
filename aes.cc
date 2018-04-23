@@ -231,7 +231,7 @@ static const uint8_t mult_14[256] = {
 vector<uint8_t> string_to_byte_vector(string input) {
   vector<uint8_t> byte_vector_;
   for (int i = 0; i < input.size(); i++) {
-    uint8_t char_byte_ = (uint8_t) input[i]; 
+    uint8_t char_byte_ = (uint8_t) input[i];
     byte_vector_.emplace_back(char_byte_);
   }
   return byte_vector_;
@@ -248,9 +248,9 @@ string hex_string(const vector<uint8_t> &bytes) {
 
 
 
-//Big endian pass in 
+//Big endian pass in
 EasyWord::EasyWord(uint8_t byte0, uint8_t byte1, uint8_t byte2, uint8_t byte3) {
-    set_byte(0, byte0); 
+    set_byte(0, byte0);
     set_byte(1, byte1);
     set_byte(2, byte2);
     set_byte(3, byte3);
