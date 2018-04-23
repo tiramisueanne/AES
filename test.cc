@@ -86,9 +86,25 @@ struct KeyMasterTest : public testing::Test {
 };
 
 TEST_F(KeyMasterTest, Init){
-  ASSERT_EQ(0x54686174, master->get_next_word());
-  ASSERT_EQ(0x73206D79, master->get_next_word());
-  ASSERT_EQ(0x204B756E, master->get_next_word());
-  ASSERT_EQ(0x67204675, master->get_next_word());
+  ASSERT_EQ(master->get_next_word(), 0x54686174);
+  ASSERT_EQ(master->get_next_word(), 0x73206D79);
+  ASSERT_EQ(master->get_next_word(), 0x204B756E);
+  ASSERT_EQ(master->get_next_word(), 0x67204675);
 }
 
+TEST_F(KeyMasterTest, NumRounds){
+  ASSERT_EQ(master->get_num_rounds(), 10);
+  const vector<uint8_t> long_vector (32, 42);
+  KeyMaster* longmaster = new KeyMaster(long_vector);
+  ASSERT_EQ(longmaster->get_num_rounds(), 14);
+}
+
+TEST_F(KeyMasterTest, RoundKeys){
+  for(int i = 0; i < 4*(master->get_num_rounds()); i++){
+    master->get_next_word();
+  }
+  ASSERT_EQ(master->get_next_word(), 0x28FDDEF8);
+  ASSERT_EQ(master->get_next_word(), 0x6DA4244A);
+  ASSERT_EQ(master->get_next_word(), 0xCCC0A4FE);
+  ASSERT_EQ(master->get_next_word(), 0x3B316F26);
+}
