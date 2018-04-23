@@ -115,11 +115,11 @@ TEST_F(KeyMasterTest, RoundKeys256Bit){
   0x61,0x08,0xd7,0x2d,0x98,0x10,0xa3,0x09,0x14,0xdf,0xf4};
   KeyMaster* longmaster = new KeyMaster(long_vector);
   for(int i = 0; i < 4*(longmaster->get_num_rounds()); i++){
-    //cout << hex<< longmaster->get_next_word() << endl;
+    longmaster->get_next_word();
   }
-  ASSERT_EQ(longmaster->get_next_word(), 0xBD10190D);
   ASSERT_EQ(longmaster->get_next_word(), 0xFE4890D1);
   ASSERT_EQ(longmaster->get_next_word(), 0xE6188D0B);
   ASSERT_EQ(longmaster->get_next_word(), 0x046DF344);
+  ASSERT_EQ(longmaster->get_next_word(), 0x706C631E);
 }
 

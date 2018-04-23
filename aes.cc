@@ -265,27 +265,32 @@ KeyMaster::KeyMaster(const vector<uint8_t> &_key)
     : key_Nb(4), key_Nk(_key.size() / key_Nb),
       key_Nr(_key.size() == 16 ? 10 : 14) {
   key_schedule_ = new EasyWord[key_Nb * (key_Nr + 1)];
-  // key_schedule algorithm, use first four words to generate the next four
-  // repeat until you have enough for every round
-  // transfer the first four words of the key to the schedule
 
+  // detect key size and generate appropriate key schedule
   if(key_Nr == 10){
     generate_128_bit_key_schedule(_key);
   }
   else{
     generate_256_bit_key_schedule(_key);
   }
+}
 
+// get the next word in the key schedule
+uint32_t KeyMaster::get_next_word() {
+  uint32_t next_word = key_schedule_[0];
+  key_schedule_ = &key_schedule_[1];
+  return next_word;
 }
 
 // create a key schedule using a 128 bit key
 void KeyMaster::generate_128_bit_key_schedule(const vector<uint8_t> &_key) {
+  
+  // add inital four words to key schedule
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j < 4; j++) {
       key_schedule_[i].set_byte(j, _key[i * 4 + j]);
     }
   }
-
   // add remaining blocks of four words to key schedule
   for (int i = 1; i <= key_Nr; i++) {
     add_four_words(i * 4);
@@ -295,23 +300,76 @@ void KeyMaster::generate_128_bit_key_schedule(const vector<uint8_t> &_key) {
 
 // create a key schedule using a 256 bit key
 void KeyMaster::generate_256_bit_key_schedule(const vector<uint8_t> &_key) {
+  
+  // add initial eight words to key schedule
   for (int i = 0; i < 8; i++) {
     for (int j = 0; j < 4; j++) {
       key_schedule_[i].set_byte(j, _key[i * 4 + j]);
     }
   }
-
-  // add remaining blocks of four words to key schedule
+  // add remaining blocks of eight words to key schedule
   for (int i = 1; i <= key_Nr/2; i++) {
     add_eight_words(i * 8);
   }
 }
 
-// get the next word in the key schedule
-uint32_t KeyMaster::get_next_word() {
-  uint32_t next_word = key_schedule_[0];
-  key_schedule_ = &key_schedule_[1];
-  return next_word;
+// adds four new words to the key_schedule using the previous four
+void KeyMaster::add_four_words(int _ks_idx) {
+  // run magic function to generate magic word
+  uint32_t magic_word =
+      schedule_core(key_schedule_[_ks_idx - 1], (int)_ks_idx / key_Nk);
+  // add first value
+  key_schedule_[_ks_idx] = key_schedule_[_ks_idx - 4] ^ magic_word;
+  // add second value
+  key_schedule_[_ks_idx + 1] =
+      key_schedule_[_ks_idx] ^ key_schedule_[_ks_idx - 3];
+  // add third value
+  key_schedule_[_ks_idx + 2] =
+      key_schedule_[_ks_idx + 1] ^ key_schedule_[_ks_idx - 2];
+  // add fourth value
+  key_schedule_[_ks_idx + 3] =
+      key_schedule_[_ks_idx + 2] ^ key_schedule_[_ks_idx - 1];
+}
+
+// adds eight new words to the key_schedule using the previous eight
+void KeyMaster::add_eight_words(int _ks_idx) {
+  //run magic function to generate magic word
+  uint32_t magic_word =
+      schedule_core(key_schedule_[_ks_idx - 1], (int)_ks_idx / key_Nk);
+  // add first value
+  key_schedule_[_ks_idx] = key_schedule_[_ks_idx - 8] ^ magic_word;
+  // add second value
+  key_schedule_[_ks_idx + 1] =
+      key_schedule_[_ks_idx] ^ key_schedule_[_ks_idx - 7];
+  // add third value
+  key_schedule_[_ks_idx + 2] =
+      key_schedule_[_ks_idx + 1] ^ key_schedule_[_ks_idx - 6];
+  // add fourth value
+  key_schedule_[_ks_idx + 3] =
+      key_schedule_[_ks_idx + 2] ^ key_schedule_[_ks_idx - 5];
+  // perform s-box and add fifth value
+  key_schedule_[_ks_idx + 4] =
+      sub_word(key_schedule_[_ks_idx + 3]) ^ key_schedule_[_ks_idx - 4];
+  // add sixth value
+  key_schedule_[_ks_idx + 5] =
+      key_schedule_[_ks_idx + 4] ^ key_schedule_[_ks_idx - 3];
+  // add seventh value
+  key_schedule_[_ks_idx + 6] =
+      key_schedule_[_ks_idx + 5] ^ key_schedule_[_ks_idx - 2];
+  // add eighth value
+  key_schedule_[_ks_idx + 7] =
+      key_schedule_[_ks_idx + 6] ^ key_schedule_[_ks_idx - 1];
+
+}
+
+// magic function to calculate the first word per round
+uint32_t KeyMaster::schedule_core(EasyWord _word, int _round) {
+  _word = rotate_word(_word);
+  _word = sub_word(_word);
+  // xor leftmost byte with precomputed ROUND_CONSTANT value
+  uint32_t round_const = (ROUND_CONSTANT[_round] << 24);
+  _word = _word ^ round_const;
+  return _word;
 }
 
 // move leftmost byte to become the rightmost byte
@@ -329,38 +387,6 @@ uint32_t KeyMaster::sub_word(EasyWord _word) {
   for (int i = 0; i < 4; i++) {
     _word.set_byte(i, S_TABLE[_word.get_byte(i)]);
   }
-  return _word;
-}
-
-// adds four new words to the key_schedule using the previous four
-void KeyMaster::add_four_words(int _ks_idx) {
-  // run magic function to generate magic word
-  uint32_t magic_word =
-      magic(key_schedule_[_ks_idx - 1], (int)_ks_idx / key_Nb);
-  // add first value
-  key_schedule_[_ks_idx] = key_schedule_[_ks_idx - 4] ^ magic_word;
-  // add second value
-  key_schedule_[_ks_idx + 1] =
-      key_schedule_[_ks_idx] ^ key_schedule_[_ks_idx - 3];
-  // add third value
-  key_schedule_[_ks_idx + 2] =
-      key_schedule_[_ks_idx + 1] ^ key_schedule_[_ks_idx - 2];
-  // add fourth value
-  key_schedule_[_ks_idx + 3] =
-      key_schedule_[_ks_idx + 2] ^ key_schedule_[_ks_idx - 1];
-}
-
-void KeyMaster::add_eight_words(int _ks_idx) {
-
-}
-
-// magic function to calculate the first word per round
-uint32_t KeyMaster::magic(EasyWord _word, int _round) {
-  _word = rotate_word(_word);
-  _word = sub_word(_word);
-  // xor leftmost byte with precomputed ROUND_CONSTANT value
-  uint32_t round_const = (ROUND_CONSTANT[_round] << 24);
-  _word = _word ^ round_const;
   return _word;
 }
 
