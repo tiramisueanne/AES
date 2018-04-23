@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
+
+#include "gtest/gtest.h"
 using namespace std;
 
 // Convert a string into a vector of bytes
@@ -18,11 +20,14 @@ class EasyWord {
 public:
   EasyWord(){};
   EasyWord(uint32_t _word) : word_(_word){};
+  EasyWord(uint8_t byte0, uint8_t byte1, uint8_t byte2, uint8_t byte3); 
   EasyWord &operator=(uint32_t _word) {
     word_ = _word;
     return *this;
   };
   operator uint32_t() const { return word_; };
+  
+  //This is big endian
   uint8_t get_byte(int index);
   void set_byte(int index, uint8_t _val);
 
@@ -67,7 +72,10 @@ private:
 };
 
 class AES {
+  friend struct AesTest;
+  FRIEND_TEST(AesTest, InitState);
 
+  FRIEND_TEST(AesTest, InitKey);  
 public:
   AES(const vector<uint8_t> &_key) : master_(_key){};
 

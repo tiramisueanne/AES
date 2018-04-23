@@ -56,6 +56,12 @@ TEST(EasyWordTest, GetByte){
   EXPECT_EQ(test.get_byte(0), 0b10100101);
 }
 
+TEST(EasyWordTest, FourByteConstructor) {
+    int x = 300;
+    EasyWord tester(x >> 24, (x << 8) >> 24, (x << 16) >> 24, (x << 24) >> 24);
+    ASSERT_EQ(tester, 300);
+}
+
 TEST(EasyWordTest, SetByte){
   EasyWord test = 2784128155;
   // 1010 0101 1111 0010 0110 1100 1001 1011
@@ -121,5 +127,59 @@ TEST_F(KeyMasterTest, RoundKeys256Bit){
   ASSERT_EQ(longmaster->get_next_word(), 0xFE4890D1);
   ASSERT_EQ(longmaster->get_next_word(), 0xE6188D0B);
   ASSERT_EQ(longmaster->get_next_word(), 0x046DF344);
+}
+
+struct AesTest : testing::Test {
+    AES *machine;
+    //TODO: This is buggy
+    static vector<uint8_t> string_hex_to_bytes(string _hex) {
+        vector<uint8_t> bytes_;
+        for(int i = 0; i <  _hex.size() -1; i+=2) {
+           string hex_ = "";
+           hex_ += _hex[i];
+           hex_ += _hex[i+1];
+           stringstream ss;
+           ss << hex << hex_;
+           unsigned char x;
+           ss >> x;
+           bytes_.emplace_back(x);
+           cout << hex << x << " ";
+        }
+        return bytes_;
+    }
+    static vector<EasyWord> bytes_to_words(vector<uint8_t> bytes_) {
+        /*
+        vector<EasyWord> _words;
+        for(int i = 0; i <
+        */
+        return vector<EasyWord>();
+    }
+    virtual void SetUp() {
+        string FIPS_128 = "00112233445566778899aabbccddeeff";
+        vector<uint8_t> key_128 = string_hex_to_bytes(FIPS_128); 
+        machine = new AES(key_128);
+    }
+
+    virtual void TearDown() {};
+};
+
+TEST_F(AesTest, InitState) {
+    vector<uint8_t> bytes_ = AesTest::string_hex_to_bytes("00112233445566778899aabbccddeeff"); 
+    //check and see if state is correct
+    for(int col = 0; col < 4; col++) {
+        for(int row  = 0; row < 4; row++) {
+            ASSERT_EQ(machine->state_[row][col], bytes_[row + col*4]); 
+        }
+    }
+}
+
+TEST_F(AesTest, InitKey) { 
+    /*
+vector<uint8_t> key_sch = AesTest::string_hex_to_bytes("000102030405060708090a0b0c0d0e0f");
+    EasyWord next_ = machine->master_.get_next_word();
+    for(int i = 0; i < 4; i++) {
+        ASSERT_EQ(next_, key_[i]); 
+    }
+    */
 }
 

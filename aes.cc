@@ -246,6 +246,16 @@ string hex_string(const vector<uint8_t> &bytes) {
   return hex_bytes_.str();
 }
 
+
+
+//Big endian pass in 
+EasyWord::EasyWord(uint8_t byte0, uint8_t byte1, uint8_t byte2, uint8_t byte3) {
+    set_byte(0, byte0); 
+    set_byte(1, byte1);
+    set_byte(2, byte2);
+    set_byte(3, byte3);
+}
+
 // index 0 refers to the leftmost byte, index 3 is rightmost
 uint8_t EasyWord::get_byte(int index) {
   assert(index >= 0 && index <= 3);
