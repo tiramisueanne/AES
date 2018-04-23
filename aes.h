@@ -52,23 +52,24 @@ private:
   const size_t key_Nk;
   // linear array of EasyWords, 4 for the start plus 4 for each round
   EasyWord *key_schedule_;
+
   // create a key schedule using a 128 bit key
   void generate_128_bit_key_schedule(const vector<uint8_t> &_key);
   // create a key schedule using a 256 bit key
   void generate_256_bit_key_schedule(const vector<uint8_t> &_key);
-  // move leftmost byte to become the rightmost byte
-  uint32_t rotate_word(EasyWord _word);
-
-  // perform simple s-box substitution
-  uint32_t sub_word(EasyWord _word);
 
   // adds four new words to the key_schedule using the previous four
   void add_four_words(int _ks_idx);
- 
+  // adds eight new words to the key_schedule using the previous eight
   void add_eight_words(int _ks_idx);
 
   // magic function to calculate the first word per round
-  uint32_t magic(EasyWord _word, int _round);
+  uint32_t schedule_core(EasyWord _word, int _round);
+  // move leftmost byte to become the rightmost byte
+  uint32_t rotate_word(EasyWord _word);
+  // perform simple s-box substitution
+  uint32_t sub_word(EasyWord _word);
+
 };
 
 class AES {
