@@ -7,6 +7,7 @@
 #include "aes.h"
 
 using namespace std;
+//#define FIX_256
 
 TEST(StringToByteVectorTest, CharCompare) {
   string sample = "Thats my Kung Fu";
@@ -297,6 +298,11 @@ TEST_F(AesTest, FirstRound) {
             ASSERT_EQ(machine->state_[row][col], s_box[row + col*4]);
         }
     }
+    machine->shift_rows();
+    machine->mix_columns();
+    machine->add_round_key();
+    vector<uint8_t> end_first = string_hex_to_bytes("89d810e8855ace682d1843d8cb128fe4");
+    
 }
 
 //So Encrypt doesn't work all the way
