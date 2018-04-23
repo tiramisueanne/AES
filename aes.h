@@ -22,7 +22,7 @@ private:
 
 class KeyMaster {
 public:
-    KeyMaster(const vector<uint8_t>& _key);
+    KeyMaster(const vector<uint8_t> &_key);
     //return the total number of rounds, 10 for 128 bit key, 14 for 256 bit
     int get_num_rounds() { return key_Nr; };
     //get the next word in the key schedule
@@ -53,7 +53,7 @@ private:
 class AES {
 
 public:
-    AES(const vector<uint8_t>& _key): master_(_key) {};
+    AES(const vector<uint8_t> &_key): master_(_key) {};
 
     // round function -
     //    for each block of set size
@@ -75,7 +75,7 @@ private:
     uint8_t state_[4][4];
 
     //moves ((block length) / 32) bytes of input into state array
-    void input_to_state(const vector<uint8_t>& input);
+    void input_to_state(const vector<uint8_t> &input);
 
     //Round key is added to the state
     void add_round_key();
