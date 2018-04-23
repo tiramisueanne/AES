@@ -32,3 +32,12 @@ $ ./aes --keyfile <keyfile> --inputfile <inputfile> --outputfile <out> --mode <e
 ```
 
 This project was built according to the specifications detailed in the CS 361: Introduction to Computer Security [AES rubric](./misc/aes.pdf) and submitted for credit.
+
+## Running tests
+
+Our test suite uses Google's [Google Test](https://github.com/google/googletest) C++ testing framework. To install Google Test on a Mac computer, follow the instructions in the [test installation README](./misc/test-install.md).
+
+To run the tests, simply run:
+```
+$ make test
+```
