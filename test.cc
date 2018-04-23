@@ -131,8 +131,6 @@ TEST_F(KeyMasterTest, RoundKeys256Bit){
 }
 
 struct AesTest : testing::Test {
-    AES *machine;
-    //TODO: This is buggy
     static vector<uint8_t> string_hex_to_bytes(string _hex) {
         vector<uint8_t> bytes_;
         for(int i = 0; i <  _hex.size() -1; i+=2) {
@@ -148,6 +146,11 @@ struct AesTest : testing::Test {
         }
         return bytes_;
     }
+
+    AES *machine;
+    string plaintext = "00112233445566778899aabbccddeeff";
+    vector<uint8_t> text_ = string_hex_to_bytes(plaintext);
+    //TODO: This is buggy
 
     static vector<EasyWord> bytes_to_words(vector<uint8_t> bytes_) {
         /*
@@ -168,12 +171,12 @@ struct AesTest : testing::Test {
 };
 
 TEST_F(AesTest, InitState) {
-    vector<uint8_t> bytes_ = AesTest::string_hex_to_bytes("00112233445566778899aabbccddeeff");
-    machine->input_to_state(bytes_);
+    //vector<uint8_t> bytes_ = AesTest::string_hex_to_bytes("00112233445566778899aabbccddeeff");
+    machine->input_to_state(text_);
     //check and see if state is correct
     for(int col = 0; col < 4; col++) {
         for(int row  = 0; row < 4; row++) {
-            EXPECT_EQ(machine->state_[row][col], bytes_[row + col*4]);
+            EXPECT_EQ(machine->state_[row][col], text_[row + col*4]);
         }
     }
 }
@@ -270,6 +273,21 @@ TEST_F(AesTest, ShiftInvShiftRows) {
 
 /*
 TEST_F(AesTest, FirstRound) {
-    vector<uint8_t> key_sch = AesTest::
+    vector<uint8_t> start_ = AesTest::string_hex_to_bytes("00102030405060708090a0b0c0d0e0f0");
+    machine->input_to_state(text_);
+    machine->add_round_key();
+    for(int col = 0; col < 4; col++) {
+        for(int row = 0; row < 4; row++) {
+            ASSERT_EQ(machine->state_[row][col], start_[row + col*4]);
+        }
+    }
 }
-*/
+
+//So Encrypt doesn't work all the way
+TEST_F(AesTest, FullEncrypt) {
+    vector<uint8_t> end_encrypt = AesTest::string_hex_to_bytes("69c4e0d86a7b0430d8cdb78070b4c55a");
+    vector<uint8_t> encrypted = machine->encrypt_this(text_);
+    for(int i = 0; i < 4; i++) {
+        EXPECT_EQ(end_encrypt[i], encrypted[i]);
+    }
+}

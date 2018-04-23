@@ -76,6 +76,7 @@ class AES {
   friend struct AesTest;
   FRIEND_TEST(AesTest, InitState);
   FRIEND_TEST(AesTest, InitKey);
+  FRIEND_TEST(AesTest, FirstRound);
   FRIEND_TEST(AesTest, ShiftRows);
   FRIEND_TEST(AesTest, InvShiftRows);
   FRIEND_TEST(AesTest, ShiftInvShiftRows);
