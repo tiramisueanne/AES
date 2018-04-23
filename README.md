@@ -23,12 +23,12 @@ We implement three classes, ```KeyMaster```, which handles everything related to
 
 ## Running AES
 
-Our implementation runs using a text-based user interface. To run the project, first compile the code using ```make``` and then run the executable using ```./tui```.
+Our implementation runs using a text-based user interface. To run the project, first compile the code using ```make``` and then run the executable using ```./aes``` with proper command line arguments.
 ```
 $ git clone git@github.com:tiramisueanne/AES.git
 $ cd AES
 $ make
-$ ./tui
+$ ./aes --keyfile <keyfile> --inputfile <inputfile> --outputfile <out> --mode <encrypt/decrypt>
 ```
 
 This project was built according to the specifications detailed in the CS 361: Introduction to Computer Security [AES rubric](./misc/aes.pdf) and submitted for credit.
