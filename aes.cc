@@ -225,6 +225,26 @@ static const uint8_t mult_14[256] = {
     0xd7, 0xd9, 0xcb, 0xc5, 0xef, 0xe1, 0xf3, 0xfd, 0xa7, 0xa9, 0xbb, 0xb5,
     0x9f, 0x91, 0x83, 0x8d};
 
+
+// Convert a string into a vector of bytes
+vector<uint8_t> string_to_byte_vector(string input) {
+  vector<uint8_t> byte_vector_;
+  for (int i = 0; i < input.size(); i++) {
+    uint8_t char_byte_ = (uint8_t) input[i]; 
+    byte_vector_.emplace_back(char_byte_);
+  }
+  return byte_vector_;
+}
+
+// Generate a string of hex values from a byte vector
+string hex_string(const vector<uint8_t> &bytes) {
+  stringstream hex_bytes_;
+  for(int i = 0; i<bytes.size(); i++){
+    hex_bytes_ << hex << (int)bytes[i];
+  }
+  return hex_bytes_.str();
+}
+
 uint8_t EasyWord::get_byte(int index) {
   assert(index >= 0 && index <= 3);
   // haha this is pretty much cheating at c++

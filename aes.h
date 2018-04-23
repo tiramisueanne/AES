@@ -5,6 +5,12 @@
 #include <vector>
 using namespace std;
 
+// Convert a string into a vector of bytes
+vector<uint8_t> string_to_byte_vector(string input);
+
+// Generate a string of hex values from a byte vector
+string hex_string(const vector<uint8_t> &bytes);
+
 // this is the number of words in each round key
 // allows for easy access into a uint32_t
 class EasyWord {
