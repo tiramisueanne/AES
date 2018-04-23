@@ -82,19 +82,26 @@ int main(int argc, char *argv[]) {
   cout << "DEBUG ==== " << "Input Hex Data : " << hex_string(input) << endl;
 #endif
 
-  //    ifstream key_file("key");
-  //    string line;
-  //    vector<uint8_t> bytes;
-  //    if(key_file.is_open()) {
-  //        while(getline(key_file, line)) {
-  //            cout << "Our super secret key is " << line << endl;
-  //            bytes = byte_vector(line);
-  //        }
-  //    }
-  //    AES machine(bytes);
-  //    cout << "Input text to encrypt: " << endl;
-  //    string textfile;
-  //    cin >> textfile;
-  //    vector<uint8_t> text_ = byte_vector(textfile);
-  //    bytes_to_output(machine.encrypt_this(text_), cout);
+  AES aes_machine(key);
+  if(mode == "encrypt"){
+    output = aes_machine.encrypt_this(input);
+  }
+  else if(mode == "decrypt") {
+    output = aes_machine.decrypt_this(input);
+  }
+  else {
+    cout << "Invalid Mode, Please type \"encrypt\" or \"decrypt\"";
+    exit(1);
+  }
+
+#ifdef DEBUG
+  cout << "DEBUG ==== " << "Output Data : " << output.data() << endl;
+  cout << "DEBUG ==== " << "Output Hex Data : " << hex_string(output) << endl;
+#endif
+
+  ofstream output_file(output_file_name);
+  if(output_file.is_open()){
+    output_file << output.data();
+  }
+  output_file.close();
 }
