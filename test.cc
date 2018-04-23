@@ -99,7 +99,7 @@ TEST_F(KeyMasterTest, NumRounds){
   ASSERT_EQ(longmaster->get_num_rounds(), 14);
 }
 
-TEST_F(KeyMasterTest, RoundKeys){
+TEST_F(KeyMasterTest, RoundKeys128Bit){
   for(int i = 0; i < 4*(master->get_num_rounds()); i++){
     master->get_next_word();
   }
@@ -108,3 +108,18 @@ TEST_F(KeyMasterTest, RoundKeys){
   ASSERT_EQ(master->get_next_word(), 0xCCC0A4FE);
   ASSERT_EQ(master->get_next_word(), 0x3B316F26);
 }
+
+TEST_F(KeyMasterTest, RoundKeys256Bit){
+  const vector<uint8_t> long_vector = {0x60,0x3d,0xeb,0x10,0x15,0xca,0x71,
+  0xbe,0x2b,0x73,0xae,0xf0,0x85,0x7d,0x77,0x81,0x1f,0x35,0x2c,0x07,0x3b,
+  0x61,0x08,0xd7,0x2d,0x98,0x10,0xa3,0x09,0x14,0xdf,0xf4};
+  KeyMaster* longmaster = new KeyMaster(long_vector);
+  for(int i = 0; i < 4*(longmaster->get_num_rounds()); i++){
+    cout << hex<< longmaster->get_next_word() << endl;
+  }
+  ASSERT_EQ(longmaster->get_next_word(), 0xBD10190D);
+  ASSERT_EQ(longmaster->get_next_word(), 0xFE4890D1);
+  ASSERT_EQ(longmaster->get_next_word(), 0xE6188D0B);
+  ASSERT_EQ(longmaster->get_next_word(), 0x046DF344);
+}
+

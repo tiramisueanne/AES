@@ -268,6 +268,18 @@ KeyMaster::KeyMaster(const vector<uint8_t> &_key)
   // key_schedule algorithm, use first four words to generate the next four
   // repeat until you have enough for every round
   // transfer the first four words of the key to the schedule
+
+  if(key_Nr == 10){
+    generate_128_bit_key_schedule(_key);
+  }
+  else{
+    generate_256_bit_key_schedule(_key);
+  }
+
+}
+
+// create a key schedule using a 128 bit key
+void KeyMaster::generate_128_bit_key_schedule(const vector<uint8_t> &_key) {
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j < 4; j++) {
       key_schedule_[i].set_byte(j, _key[i * 4 + j]);
@@ -275,8 +287,23 @@ KeyMaster::KeyMaster(const vector<uint8_t> &_key)
   }
 
   // add remaining blocks of four words to key schedule
-  for (int i = 0; i < key_Nr; i++) {
-    add_four_words((i + 1) * 4);
+  for (int i = 1; i <= key_Nr; i++) {
+    add_four_words(i * 4);
+  }
+}
+
+
+// create a key schedule using a 256 bit key
+void KeyMaster::generate_256_bit_key_schedule(const vector<uint8_t> &_key) {
+  for (int i = 0; i < 8; i++) {
+    for (int j = 0; j < 4; j++) {
+      key_schedule_[i].set_byte(j, _key[i * 4 + j]);
+    }
+  }
+
+  // add remaining blocks of four words to key schedule
+  for (int i = 1; i <= key_Nr/2; i++) {
+    add_eight_words(i * 8);
   }
 }
 

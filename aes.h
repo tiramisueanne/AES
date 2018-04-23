@@ -47,6 +47,10 @@ private:
   const size_t key_Nk;
   // linear array of EasyWords, 4 for the start plus 4 for each round
   EasyWord *key_schedule_;
+  // create a key schedule using a 128 bit key
+  void generate_128_bit_key_schedule(const vector<uint8_t> &_key);
+  // create a key schedule using a 256 bit key
+  void generate_256_bit_key_schedule(const vector<uint8_t> &_key);
   // move leftmost byte to become the rightmost byte
   uint32_t rotate_word(EasyWord _word);
 
