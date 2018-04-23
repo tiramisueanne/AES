@@ -1,6 +1,5 @@
 #include <string>
 #include <fstream>
-#include <sstream>
 #include <iostream>
 
 #include "aes.h"
@@ -75,6 +74,7 @@ int main(int argc, char *argv[]) {
     exit(1);
   }
 
+
 #ifdef DEBUG
   cout << "DEBUG ==== " << "Output Data : " << output.data() << endl;
   cout << "DEBUG ==== " << "Output Hex Data : " << hex_string(output) << endl;
@@ -85,4 +85,5 @@ int main(int argc, char *argv[]) {
     output_file << output.data();
   }
   output_file.close();
+
 }
