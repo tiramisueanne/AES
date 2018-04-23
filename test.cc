@@ -141,6 +141,14 @@ TEST_F(KeyMasterTest, RoundKeys256Bit){
 #endif
 
 struct AesTest : testing::Test {
+    void check_vector_state(vector<uint8_t> vec) {
+        for(int col = 0; col < 4; col++) {
+            for(int row = 0; row < 4; row++) {
+                ASSERT_EQ(machine->state_[row][col], vec[row + col*4]);
+            }
+        }
+
+    }
     static vector<uint8_t> string_hex_to_bytes(string _hex) {
         vector<uint8_t> bytes_;
         for(int i = 0; i <  _hex.size() -1; i+=2) {
@@ -280,7 +288,7 @@ TEST_F(AesTest, ShiftInvShiftRows) {
     }
 }
 
-/*
+
 TEST_F(AesTest, FirstRound) {
     vector<uint8_t> start_ = AesTest::string_hex_to_bytes("00102030405060708090a0b0c0d0e0f0");
     machine->input_to_state(text_);
@@ -293,15 +301,30 @@ TEST_F(AesTest, FirstRound) {
     vector<uint8_t> s_box = string_hex_to_bytes("63cab7040953d051cd60e0e7ba70e18c");
     ASSERT_EQ(s_box.size(), 16);
     machine->sub_bytes();
+    cout << "Check sub_bytes" << endl;
     for(int col = 0; col < 4; col++) {
         for(int row = 0; row < 4; row++) {
             ASSERT_EQ(machine->state_[row][col], s_box[row + col*4]);
         }
     }
+    cout << "Check shift_rows" << endl;
     machine->shift_rows();
+    vector<uint8_t> shift_row = string_hex_to_bytes("6353e08c0960e104cd70b751bacad0e7");
+    check_vector_state(shift_row);
+
+    cout << "Check_mix_columns" << endl;
     machine->mix_columns();
-    machine->add_round_key();
+    vector<uint8_t> mix_columns = string_hex_to_bytes("5f72641557f5bc92f7be3b291db9f91a");
+    check_vector_state(mix_columns);
+
+    cout << "End of round 1" << endl;
+    //checking the start of the next thing, which is after checking round_key
     vector<uint8_t> end_first = string_hex_to_bytes("89d810e8855ace682d1843d8cb128fe4");
+    for(int col = 0; col < 4; col++) {
+        for(int row = 0; row < 4; row++) {
+            ASSERT_EQ(machine->state_[row][col], end_first[row + col*4]);
+        }
+    }
     
 }
 
@@ -313,4 +336,3 @@ TEST_F(AesTest, FullEncrypt) {
         EXPECT_EQ(end_encrypt[i], encrypted[i]);
     }
 }
-*/

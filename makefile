@@ -9,6 +9,11 @@ EXEC=aes
 all: $(BASE)
 	g++ -std=c++14 $(BASE) -o $(EXEC)
 
+# type in "make run" to run the program
+run: $(BASE)
+	g++ -std=c++14 -g $(BASE) -o $(EXEC)
+	./$(EXEC)
+
 .PRECIOUS: test
 # type in "make test" to run all unit tests
 test: $(TESTING)
