@@ -246,19 +246,19 @@ string hex_string(const vector<uint8_t> &bytes) {
   return hex_bytes_.str();
 }
 
-// index 0 refers to the rightmost byte, index 3 is leftmost
+// index 0 refers to the leftmost byte, index 3 is rightmost
 uint8_t EasyWord::get_byte(int index) {
   assert(index >= 0 && index <= 3);
   // haha this is pretty much cheating at c++
   uint8_t *byte_ptr = reinterpret_cast<uint8_t *>(&word_);
-  return byte_ptr[index];
+  return byte_ptr[3-index];
 }
 
 void EasyWord::set_byte(int index, uint8_t _val) {
   assert(index >= 0 && index <= 3);
   // haha this is pretty much cheating at c++
   uint8_t *byte_ptr = reinterpret_cast<uint8_t *>(&word_);
-  byte_ptr[index] = _val;
+  byte_ptr[3-index] = _val;
 }
 
 KeyMaster::KeyMaster(const vector<uint8_t> &_key)
@@ -266,8 +266,7 @@ KeyMaster::KeyMaster(const vector<uint8_t> &_key)
       key_Nr(_key.size() == 16 ? 10 : 14) {
   key_schedule_ = new EasyWord[key_Nb * (key_Nr + 1)];
   // key_schedule algorithm, use first four words to generate the next four
-  // repeat until you have enough for every
-
+  // repeat until you have enough for every round
   // transfer the first four words of the key to the schedule
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j < 4; j++) {
