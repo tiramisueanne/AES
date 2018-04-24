@@ -603,8 +603,7 @@ void AES::sub_bytes() {
 }
 
 // see https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197.pdf
-//   explanation    (p.22,   5.3.2
-)
+//   explanation    (p.22,   5.3.2)
 void AES::inv_sub_bytes() {
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j < 4; j++) {

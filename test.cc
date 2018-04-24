@@ -104,13 +104,13 @@ TEST_F(KeyMasterTest, Init){
 TEST_F(KeyMasterTest, NumRounds){
   //Test the two different size
   EXPECT_EQ(master->get_num_rounds(), 10);
- 
+
 #ifdef FIX_256
   const vector<uint8_t> long_vector (32, 42);
   KeyMaster* longmaster = new KeyMaster(long_vector);
   EXPECT_EQ(longmaster->get_num_rounds(), 14);
 #endif
-  
+
 }
 
 TEST_F(KeyMasterTest, RoundKeys128Bit){
@@ -140,7 +140,7 @@ TEST_F(KeyMasterTest, RoundKeys256Bit){
 }
 #endif
 
-struct AesTest : testing::Test {
+struct AESTest128 : testing::Test {
     void check_vector_state(vector<uint8_t> vec) {
         for(int col = 0; col < 4; col++) {
             for(int row = 0; row < 4; row++) {
@@ -188,7 +188,7 @@ struct AesTest : testing::Test {
     };
 };
 
-TEST_F(AesTest, InitState) {
+TEST_F(AESTest128, InitState) {
     machine->input_to_state(text_);
     //check and see if state is correct
     for(int col = 0; col < 4; col++) {
@@ -198,15 +198,15 @@ TEST_F(AesTest, InitState) {
     }
 }
 
-TEST_F(AesTest, InitKey) {
-    vector<uint8_t> key_sch = AesTest::string_hex_to_bytes("000102030405060708090a0b0c0d0e0f");
+TEST_F(AESTest128, InitKey) {
+    vector<uint8_t> key_sch = AESTest128::string_hex_to_bytes("000102030405060708090a0b0c0d0e0f");
     EasyWord next_word = machine->master_.get_next_word();
     //Tried indexing descending and ascending and both look wrong sadly
     EasyWord correct_word = EasyWord(key_sch[0], key_sch[1], key_sch[2], key_sch[3]);
     EXPECT_EQ(next_word, correct_word);
 }
 
-TEST_F(AesTest, ShiftRows) {
+TEST_F(AESTest128, ShiftRows) {
     uint8_t state[4][4] = {
       {0x0, 0x1, 0x2, 0x3},
       {0x4, 0x5, 0x6, 0x7},
@@ -236,7 +236,7 @@ TEST_F(AesTest, ShiftRows) {
     }
 }
 
-TEST_F(AesTest, InvShiftRows) {
+TEST_F(AESTest128, InvShiftRows) {
     uint8_t state[4][4] = {
       {0x0, 0x1, 0x2, 0x3},
       {0x4, 0x5, 0x6, 0x7},
@@ -266,7 +266,7 @@ TEST_F(AesTest, InvShiftRows) {
     }
 }
 
-TEST_F(AesTest, ShiftInvShiftRows) {
+TEST_F(AESTest128, ShiftInvShiftRows) {
     uint8_t state[4][4] = {
       {0x0, 0x1, 0x2, 0x3},
       {0x4, 0x5, 0x6, 0x7},
@@ -288,10 +288,10 @@ TEST_F(AesTest, ShiftInvShiftRows) {
     }
 }
 
-TEST_F(AesTest, MixColumn) {
+TEST_F(AESTest128, MixColumn) {
     uint8_t new_state[4][4] = {
-    {0xd4, 0, 0, 0}, 
-    {0xbf, 0, 0, 0}, 
+    {0xd4, 0, 0, 0},
+    {0xbf, 0, 0, 0},
     {0x5d, 0, 0, 0},
     {0x30, 0, 0, 0}
     };
@@ -323,8 +323,8 @@ TEST_F(AesTest, MixColumn) {
 }
 
 
-TEST_F(AesTest, FirstRound) {
-    vector<uint8_t> start_ = AesTest::string_hex_to_bytes("00102030405060708090a0b0c0d0e0f0");
+TEST_F(AESTest128, FirstRound) {
+    vector<uint8_t> start_ = AESTest128::string_hex_to_bytes("00102030405060708090a0b0c0d0e0f0");
     machine->input_to_state(text_);
     machine->add_round_key();
     for(int col = 0; col < 4; col++) {
@@ -359,12 +359,12 @@ TEST_F(AesTest, FirstRound) {
             ASSERT_EQ(machine->state_[row][col], end_first[row + col*4]);
         }
     }
-    
+
 }
 
 //So Encrypt doesn't work all the way
-TEST_F(AesTest, FullEncrypt) {
-    vector<uint8_t> end_encrypt = AesTest::string_hex_to_bytes("69c4e0d86a7b0430d8cdb78070b4c55a");
+TEST_F(AESTest128, FullEncrypt) {
+    vector<uint8_t> end_encrypt = AESTest128::string_hex_to_bytes("69c4e0d86a7b0430d8cdb78070b4c55a");
     vector<uint8_t> encrypted = machine->encrypt_this(text_);
     for(int i = 0; i < 4; i++) {
         EXPECT_EQ(end_encrypt[i], encrypted[i]);

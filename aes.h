@@ -78,14 +78,14 @@ private:
 };
 
 class AES {
-  friend struct AesTest;
-  FRIEND_TEST(AesTest, InitState);
-  FRIEND_TEST(AesTest, InitKey);
-  FRIEND_TEST(AesTest, FirstRound);
-  FRIEND_TEST(AesTest, ShiftRows);
-  FRIEND_TEST(AesTest, InvShiftRows);
-  FRIEND_TEST(AesTest, ShiftInvShiftRows);
-  FRIEND_TEST(AesTest, MixColumn);
+  friend struct AESTest128;
+  FRIEND_TEST(AESTest128, InitState);
+  FRIEND_TEST(AESTest128, InitKey);
+  FRIEND_TEST(AESTest128, FirstRound);
+  FRIEND_TEST(AESTest128, ShiftRows);
+  FRIEND_TEST(AESTest128, InvShiftRows);
+  FRIEND_TEST(AESTest128, ShiftInvShiftRows);
+  FRIEND_TEST(AESTest128, MixColumn);
 
 public:
   AES(const vector<uint8_t> &_key) : master_(_key){};
@@ -139,10 +139,10 @@ private:
   // moves ((block length) / 32) bytes of state array to output
   vector<uint8_t> state_to_output();
 
-  static const uint8_t mult_2[256];  
-  static const uint8_t mult_3[256];  
-  static const uint8_t mult_9[256];  
-  static const uint8_t mult_11[256];  
-  static const uint8_t mult_13[256];  
-  static const uint8_t mult_14[256];  
+  static const uint8_t mult_2[256];
+  static const uint8_t mult_3[256];
+  static const uint8_t mult_9[256];
+  static const uint8_t mult_11[256];
+  static const uint8_t mult_13[256];
+  static const uint8_t mult_14[256];
 };
