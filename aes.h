@@ -86,6 +86,8 @@ class AES {
   FRIEND_TEST(AesTest, InvShiftRows);
   FRIEND_TEST(AesTest, ShiftInvShiftRows);
   FRIEND_TEST(AesTest, MixColumn);
+  FRIEND_TEST(AesTest, BasicSubBytes);
+  FRIEND_TEST(AesTest, SubBytes);
 
 public:
   AES(const vector<uint8_t> &_key) : master_(_key){};
@@ -139,10 +141,10 @@ private:
   // moves ((block length) / 32) bytes of state array to output
   vector<uint8_t> state_to_output();
 
-  static const uint8_t mult_2[256];  
-  static const uint8_t mult_3[256];  
-  static const uint8_t mult_9[256];  
-  static const uint8_t mult_11[256];  
-  static const uint8_t mult_13[256];  
-  static const uint8_t mult_14[256];  
+  static const uint8_t mult_2[256];
+  static const uint8_t mult_3[256];
+  static const uint8_t mult_9[256];
+  static const uint8_t mult_11[256];
+  static const uint8_t mult_13[256];
+  static const uint8_t mult_14[256];
 };
