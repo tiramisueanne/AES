@@ -3,6 +3,9 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
+
+#include "gtest/gtest.h"
+
 using namespace std;
 
 // Convert a string into a vector of bytes
@@ -18,11 +21,14 @@ class EasyWord {
 public:
   EasyWord(){};
   EasyWord(uint32_t _word) : word_(_word){};
+  EasyWord(uint8_t byte0, uint8_t byte1, uint8_t byte2, uint8_t byte3);
   EasyWord &operator=(uint32_t _word) {
     word_ = _word;
     return *this;
   };
   operator uint32_t() const { return word_; };
+
+  //This is big endian
   uint8_t get_byte(int index);
   void set_byte(int index, uint8_t _val);
 
@@ -37,6 +43,10 @@ public:
   int get_num_rounds() { return key_Nr; };
   // get the next word in the key schedule
   uint32_t get_next_word();
+
+  ~KeyMaster() {
+    delete []  key_schedule_;
+  };
 
 private:
   // number of rounds ( 128 bit - 10 | 256 bit - 14 )
@@ -68,6 +78,14 @@ private:
 };
 
 class AES {
+  friend struct AesTest;
+  FRIEND_TEST(AesTest, InitState);
+  FRIEND_TEST(AesTest, InitKey);
+  FRIEND_TEST(AesTest, FirstRound);
+  FRIEND_TEST(AesTest, ShiftRows);
+  FRIEND_TEST(AesTest, InvShiftRows);
+  FRIEND_TEST(AesTest, ShiftInvShiftRows);
+  FRIEND_TEST(AesTest, MixColumn);
 
 public:
   AES(const vector<uint8_t> &_key) : master_(_key){};
@@ -102,6 +120,8 @@ private:
   // inverse of shift_rows
   void inv_shift_rows();
 
+  vector<uint8_t> multiply_column(function<uint8_t(uint8_t)> matrix[4][4], int col_index);
+
   // multiplies matricies
   void matrix_multiply(function<uint8_t(uint8_t)> matrix[4][4]);
 
@@ -118,4 +138,11 @@ private:
 
   // moves ((block length) / 32) bytes of state array to output
   vector<uint8_t> state_to_output();
+
+  static const uint8_t mult_2[256];  
+  static const uint8_t mult_3[256];  
+  static const uint8_t mult_9[256];  
+  static const uint8_t mult_11[256];  
+  static const uint8_t mult_13[256];  
+  static const uint8_t mult_14[256];  
 };
