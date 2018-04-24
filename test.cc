@@ -7,7 +7,7 @@
 #include "aes.h"
 
 using namespace std;
-//#define FIX_256
+#define FIX_256
 
 TEST(StringToByteVectorTest, CharCompare) {
   string sample = "Thats my Kung Fu";
@@ -136,7 +136,6 @@ TEST_F(KeyMasterTest, RoundKeys256Bit){
   EXPECT_EQ(longmaster->get_next_word(), 0xE6188D0B);
   EXPECT_EQ(longmaster->get_next_word(), 0x046DF344);
   EXPECT_EQ(longmaster->get_next_word(), 0x706C631E);
-  delete longmaster;
 }
 #endif
 
