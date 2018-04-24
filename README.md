@@ -16,8 +16,9 @@ We implement the AES algorithm in ```aes.cc```. Plaintext for encrypting and enc
 We implement three classes, ```KeyMaster```, which handles everything related to the given key, including rotation, addition, and constants that rely on key length; ```EasyWord```, which performs operations on words, such as getting and setting byte values; and ```AES```, which performs encryption and decryption.
 
 ### KeyMaster
-
+The KeyMaster class abstracts away the Key Expansion process. The KeyMaster can take in either a 128 or 256 bit key and will perform the according operations. The KeyMaster needs to generate a key schedule to provide words, four of which constitute one round key. These round keys are XOR'd with the current state through the method add_round_key. In this implementation, we have a method called get_next_word that acts as an iterator through the key schedule. add_round_key will call get_next_word four times and XOR each word with the corresponding columns in the state. There will be 44 values in the key schedule for a 128 bit key and 60 for a 256 bit key. The entire key is loaded into the key schedule and then a special function is performed using rotation, substitution, and round constants to generate the next value, followed by a series of XOR's to generate the rest. This recrsive strategy fills up the entire key schedule.
 ### EasyWord
+EasyWord is a wrapper class for a uint32_t that allows the user to very easily set bytes and also get bytes. It abstracts away little endian byte storage and can be implicitly casted as a uint32_t. EasyWord is the datatype we use in our keymaster and key schedule because it makes key expansion much easier, since key expansion involved lots of getting and setting of individual bits. 
 
 ### AES
 
