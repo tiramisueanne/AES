@@ -275,7 +275,7 @@ KeyMaster::KeyMaster(const vector<uint8_t> &_key)
     : key_Nb(4), key_Nk(_key.size() / key_Nb),
       key_Nr(_key.size() == 16 ? 10 : 14) {
   key_schedule_ = new EasyWord[(key_Nb * (key_Nr + 1))+4];
-  key_schedule_posterior_ = &key_schedule_[key_Nb * (key_Nr + 1)-1];
+  key_schedule_posterior_ = &key_schedule_[(key_Nb * (key_Nr + 1))-1];
 
   // detect key size and generate appropriate key schedule
   if(key_Nr == 10){
