@@ -590,8 +590,45 @@ TEST_F(AESTest128, FullDecrypt) {
     }
 }
 
+TEST_F(AESTest256, FirstRound) {
+    vector<uint8_t> cipher_ = string_hex_to_bytes("8ea2b7ca516745bfeafc49904b496089");
+    machine->input_to_state(cipher_);
+    //cout << "We are testing input to state" << endl;
+    check_vector_state(cipher_); 
+
+    machine->add_round_key_reverse();
+
+    //cout << "We are about to check whether the state makes sense" << endl;
+    vector<uint8_t> check_string = string_hex_to_bytes("aa5ece06ee6e3c56dde68bac2621bebf");
+    check_vector_state(check_string);
+
+    //cout << "Inverse shift rows" << endl;
+    machine->inv_shift_rows();
+    vector<uint8_t> inv_shift_row = string_hex_to_bytes("aa218b56ee5ebeacdd6ecebf26e63c06");
+    check_vector_state(inv_shift_row);
+
+
+    //cout << "We are about to try inv_sub" << endl;
+    vector<uint8_t> inv_s_box = string_hex_to_bytes("627bceb9999d5aaac945ecf423f56da5");
+    ASSERT_EQ(inv_s_box.size(), 16);
+    machine->inv_sub_bytes();
+    check_vector_state(inv_s_box);
+    
+    //cout << "We are about to try add_round_key " << endl;
+    machine->add_round_key_reverse();
+    vector<uint8_t> add_key = string_hex_to_bytes("2c21a820306f154ab712c75eee0da04f");
+    check_vector_state(add_key);
+    
+
+    //cout << "We are about to inv mix columns" << endl; 
+    machine->inv_mix_columns();
+    vector<uint8_t> inv_mix_columns = string_hex_to_bytes("d1ed44fd1a0f3f2afa4ff27b7c332a69");
+    check_vector_state(inv_mix_columns);
+
+}
+
 TEST_F(AESTest256, FullDecrypt) {
-    vector<uint8_t> cipher_ =  string_hex_to_bytes("dda97ca4864cdfe06eaf70a0ec0d7191");
+    vector<uint8_t> cipher_ =  string_hex_to_bytes("8ea2b7ca516745bfeafc49904b496089");
     vector<uint8_t> check_plain_ = machine->decrypt_this(cipher_);
 	vector<uint8_t> plain_ = string_hex_to_bytes("00112233445566778899aabbccddeeff");
     for(int i = 0; i < 16; i++) {
