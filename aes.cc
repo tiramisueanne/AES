@@ -275,6 +275,7 @@ KeyMaster::KeyMaster(const vector<uint8_t> &_key)
     : key_Nb(4), key_Nk(_key.size() / key_Nb),
       key_Nr(_key.size() == 16 ? 10 : 14) {
   key_schedule_ = new EasyWord[(key_Nb * (key_Nr + 1))+4];
+  key_schedule_posterior_ = &key_schedule_[(key_Nb * (key_Nr + 1))-1];
 
   // detect key size and generate appropriate key schedule
   if(key_Nr == 10){
@@ -285,11 +286,26 @@ KeyMaster::KeyMaster(const vector<uint8_t> &_key)
   }
 }
 
+void KeyMaster::print_key_schedule() {
+  cout << hex << *key_schedule_posterior_ << endl;
+  for(int i = (key_Nr+1)*key_Nb -1; i>=0; i--){
+    cout << hex << key_schedule_[i];
+  }
+  cout << endl;
+}
+
 // get the next word in the key schedule
 uint32_t KeyMaster::get_next_word() {
   uint32_t next_word = key_schedule_[0];
   key_schedule_ = &key_schedule_[1];
   return next_word;
+}
+
+// get the last word in the key schedule
+uint32_t KeyMaster::get_last_word() {
+  uint32_t last_word = *key_schedule_posterior_;
+  key_schedule_posterior_ = key_schedule_posterior_ - 1;
+  return last_word;
 }
 
 // create a key schedule using a 128 bit key
@@ -461,18 +477,18 @@ vector<uint8_t> AES::decrypt_this(vector<uint8_t> &_vectortext) {
     // put block in state
     input_to_state(block);
 
-    add_round_key();
+    add_round_key_reverse();
 
     for (int j = 0; j < master_.get_num_rounds() - 1; j++) {
       inv_shift_rows();
       inv_sub_bytes();
-      add_round_key();
+      add_round_key_reverse();
       inv_mix_columns();
     }
 
     inv_shift_rows();
     inv_sub_bytes();
-    add_round_key();
+    add_round_key_reverse();
 
     vector<uint8_t> block_output = state_to_output();
     for (uint8_t j = 0; j < block_output.size(); j++) {
@@ -499,6 +515,18 @@ void AES::add_round_key() {
     EasyWord next_word = master_.get_next_word();
     for (int byte = 0; byte < 4; byte++) {
       state_[byte][word] = state_[byte][word] ^ next_word.get_byte(byte);
+    }
+  }
+}
+
+// see https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197.pdf
+//   explanation    (p.18-19,   5.1.4)
+//   explanation    (p.23,      5.3.4)
+void AES::add_round_key_reverse() {
+  for (int word = 0; word < 4; word++) {
+    EasyWord last_word = master_.get_last_word();
+    for (int byte = 0; byte < 4; byte++) {
+      state_[byte][3-word] = state_[byte][3-word] ^ last_word.get_byte(byte);
     }
   }
 }
