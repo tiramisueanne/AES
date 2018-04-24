@@ -47,6 +47,9 @@ public:
   uint32_t get_last_word();
 
 private:
+  FRIEND_TEST(AESTest128, FirstRoundDecrypt);
+  FRIEND_TEST(AESTest128, CheckFirstKey);
+
   // number of rounds ( 128 bit - 10 | 256 bit - 14 )
   const size_t key_Nr;
   // number of words in a state ( 128 bit - 4 | 256 bit - 4 )
@@ -89,9 +92,11 @@ class AES {
   FRIEND_TEST(AESTest128, SubBytes);
   FRIEND_TEST(AESTest128, BasicInvSubBytes);
   FRIEND_TEST(AESTest128, InvSubBytes);
+  FRIEND_TEST(AESTest128, FullEncrypt); 
   FRIEND_TEST(AESTest256, FullEncrypt); 
+  FRIEND_TEST(AESTest128, FirstRoundDecrypt);
+  FRIEND_TEST(AESTest128, CheckFirstKey);
 
-public:
   AES(const vector<uint8_t> &_key) : master_(_key){};
 
   // round function -
