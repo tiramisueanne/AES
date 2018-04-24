@@ -346,8 +346,7 @@ void KeyMaster::add_four_words(int _ks_idx) {
   // run magic function to generate magic word
   assert(key_Nk > 0);
   uint32_t magic_word =
-      schedule_core(key_schedule_[_ks_idx - 1], 
-reinterpret_cast<int>(_ks_idx)/ key_Nk);
+      schedule_core(key_schedule_[_ks_idx - 1], reinterpret_cast<int>(_ks_idx)/ key_Nk);
   // add first value
   key_schedule_[_ks_idx] = key_schedule_[_ks_idx - 4] ^ magic_word;
   // add second value
@@ -365,8 +364,7 @@ reinterpret_cast<int>(_ks_idx)/ key_Nk);
 void KeyMaster::add_eight_words(int _ks_idx) {
   // run magic function to generate magic word
   uint32_t magic_word =
-      schedule_core(key_schedule_[_ks_idx - 1], 
-		reinterpret_cast<int>(_ks_idx) / key_Nk);
+      schedule_core(key_schedule_[_ks_idx - 1], reinterpret_cast<int>(_ks_idx) / key_Nk);
   // add first value
   key_schedule_[_ks_idx] = key_schedule_[_ks_idx - 8] ^ magic_word;
   // add second value
