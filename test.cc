@@ -407,7 +407,6 @@ TEST_F(AesTest, FirstRound) {
 
     machine->add_round_key();
 
-    cout << "End of round 1" << endl;
     //checking the start of the next thing, which is after checking round_key
     vector<uint8_t> end_first = string_hex_to_bytes("89d810e8855ace682d1843d8cb128fe4");
     for(int col = 0; col < 4; col++) {
