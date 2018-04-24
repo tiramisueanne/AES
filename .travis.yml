@@ -9,7 +9,7 @@ before_install:
   - sudo cmake CMakeLists.txt
   - sudo make
   - sudo cp *.a /usr/lib
-  - cd path
+  - cd $path
 
 script:
   - make
