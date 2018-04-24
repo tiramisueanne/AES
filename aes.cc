@@ -286,6 +286,12 @@ KeyMaster::KeyMaster(const vector<uint8_t> &_key)
   }
 }
 
+void KeyMaster::print_key_schedule(){
+  for(int i = 0; i<(key_Nb * (key_Nr+1)); i++){
+    cout << "K_S_Word " << dec << i << " : " << hex << key_schedule_[i] << endl;
+  }
+}
+
 // get the next word in the key schedule
 uint32_t KeyMaster::get_next_word() {
   uint32_t next_word = key_schedule_[0];

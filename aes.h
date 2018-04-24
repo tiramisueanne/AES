@@ -45,6 +45,8 @@ public:
   uint32_t get_next_word();
   // get the last word in the key schedule
   uint32_t get_last_word();
+  //print key_schedule to cout
+  void print_key_schedule();
 
 private:
   FRIEND_TEST(AESTest128, FirstRoundDecrypt);
