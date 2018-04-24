@@ -5,8 +5,6 @@ cpplint *.h
 
 cc_diff="$(cpplint --quiet *.cc 2>&1)"
 h_diff="$(cpplint --quiet *.h 2>&1)"
-# { cc_diff=$(cpplint *.cc 2>&1 1>&3-) ;} 3>&1
-# { h_diff=$(cpplint *.h 2>&1 1>&3-) ;} 3>&1
 
 if [ "$cc_diff" == "" ] && [ "$h_diff" == "" ]
 then

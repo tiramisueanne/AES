@@ -1,4 +1,4 @@
-# AES [![Build Status](https://travis-ci.com/tiramisueanne/AES.svg?token=BgoxeAxVjBykZQxAiV5q&branch=master)](https://travis-ci.com/tiramisueanne/AES)
+# AES [![Build Status](https://travis-ci.org/tiramisueanne/AES.svg?branch=master)](https://travis-ci.org/tiramisueanne/AES)
 
 [Sue Anne Davis](https://github.com/tiramisueanne), [Akash Kwatra](https://github.com/akashkw), [Benny Singer](https://github.com/bzsinger)
 
