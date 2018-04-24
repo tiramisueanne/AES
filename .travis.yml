@@ -11,5 +11,6 @@ before_install:
   - cd ../../..
 
 script:
+  - cd AES
   - make
   - make test
