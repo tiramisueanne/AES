@@ -543,14 +543,8 @@ TEST_F(AESTest128, CheckFirstKey) {
     //this is the key if we want    
     
     vector<uint8_t> check_s = string_hex_to_bytes("13111d7fe3944a17f307a78b4d2b30c5");
-    //TODO: fix me!
-    machine->add_round_key();
-    for(int i = 0; i < 16; i++) {
-        //might be 4- i%4
-        //cout << "The key state is " << (machine->master_.key_schedule_[i/4]).get_byte(i%4) << endl;
-        //EXPECT_EQ((machine->master_.key_schedule_[i/4]).get_byte(i%4), check_s[i]);
-    }
-
+    machine->master_.print_key_schedule();
+    machine->add_round_key_reverse();
 }
 
 TEST_F(AESTest128, FirstRoundDecrypt) {
@@ -558,7 +552,7 @@ TEST_F(AESTest128, FirstRoundDecrypt) {
     cout << "We are testing input to state" << endl;
     check_vector_state(ciphertext_); 
 
-    machine->add_round_key();
+    machine->add_round_key_reverse();
 
     cout << "We are about to check whether the state makes sense" << endl;
     vector<uint8_t> check_string = string_hex_to_bytes("7ad5fda789ef4e272bca100b3d9ff59f");
@@ -577,7 +571,7 @@ TEST_F(AESTest128, FirstRoundDecrypt) {
     check_vector_state(inv_s_box);
     
     cout << "We are about to try add_round_key " << endl;
-    machine->add_round_key();
+    machine->add_round_key_reverse();
     vector<uint8_t> add_key = string_hex_to_bytes("e9f74eec023020f61bf2ccf2353c21c7");
     check_vector_state(add_key);
     
@@ -586,15 +580,12 @@ TEST_F(AESTest128, FirstRoundDecrypt) {
     machine->inv_mix_columns();
     vector<uint8_t> inv_mix_columns = string_hex_to_bytes("54d990a16ba09ab596bbf40ea111702f");
     check_vector_state(inv_mix_columns);
-
-
-    //checking the start of the next thing, which is after checking round_key
-    vector<uint8_t> end_first = string_hex_to_bytes("89d810e8855ace682d1843d8cb128fe4");
-    for(int col = 0; col < 4; col++) {
-        for(int row = 0; row < 4; row++) {
-            ASSERT_EQ(machine->state_[row][col], end_first[row + col*4]);
-        }
-    }
 }
 
-
+TEST_F(AESTest128, FullDecrypt) {
+	vector<uint8_t> end_res = string_hex_to_bytes("00112233445566778899aabbccddeeff");
+    vector<uint8_t> dec = machine->decrypt_this(ciphertext_);
+    for(int i = 0; i < 16; i++) {
+        EXPECT_EQ(dec[i], text_[i]);            
+    }
+}

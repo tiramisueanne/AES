@@ -98,7 +98,8 @@ class AES {
   FRIEND_TEST(AESTest256, FullEncrypt); 
   FRIEND_TEST(AESTest128, FirstRoundDecrypt);
   FRIEND_TEST(AESTest128, CheckFirstKey);
-
+  FRIEND_TEST(AESTest128, FullDecrypt);
+public:
   AES(const vector<uint8_t> &_key) : master_(_key){};
 
   // round function -

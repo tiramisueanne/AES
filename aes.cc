@@ -275,7 +275,7 @@ KeyMaster::KeyMaster(const vector<uint8_t> &_key)
     : key_Nb(4), key_Nk(_key.size() / key_Nb),
       key_Nr(_key.size() == 16 ? 10 : 14) {
   key_schedule_ = new EasyWord[(key_Nb * (key_Nr + 1))+4];
-  key_schedule_posterior_ = &key_schedule_[key_Nb * (key_Nr + 1)];
+  key_schedule_posterior_ = &key_schedule_[key_Nb * (key_Nr + 1)-1];
 
   // detect key size and generate appropriate key schedule
   if(key_Nr == 10){
@@ -286,10 +286,12 @@ KeyMaster::KeyMaster(const vector<uint8_t> &_key)
   }
 }
 
-void KeyMaster::print_key_schedule(){
-  for(int i = 0; i<(key_Nb * (key_Nr+1)); i++){
-    cout << "K_S_Word " << dec << i << " : " << hex << key_schedule_[i] << endl;
+void KeyMaster::print_key_schedule() {
+  cout << hex << *key_schedule_posterior_ << endl;
+  for(int i = (key_Nr+1)*key_Nb -1; i>=0; i--){
+    cout << hex << key_schedule_[i];
   }
+  cout << endl;
 }
 
 // get the next word in the key schedule
@@ -302,7 +304,7 @@ uint32_t KeyMaster::get_next_word() {
 // get the last word in the key schedule
 uint32_t KeyMaster::get_last_word() {
   uint32_t last_word = *key_schedule_posterior_;
-  key_schedule_ = key_schedule_ - 1;
+  key_schedule_posterior_ = key_schedule_posterior_ - 1;
   return last_word;
 }
 
@@ -480,7 +482,7 @@ vector<uint8_t> AES::decrypt_this(vector<uint8_t> &_vectortext) {
     for (int j = 0; j < master_.get_num_rounds() - 1; j++) {
       inv_shift_rows();
       inv_sub_bytes();
-      add_round_key();
+      add_round_key_reverse();
       inv_mix_columns();
     }
 
