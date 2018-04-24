@@ -30,7 +30,9 @@ clean:
 runtest: test clean
 
 lint-check:
-	./lint-check.sh
+	chmod +x ./lint-check.sh
+	bash ./lint-check.sh
 
 lint:
-	./lint-code.sh
+	chmod +x ./lint-code.sh
+	bash ./lint-code.sh
