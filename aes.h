@@ -43,6 +43,8 @@ public:
   int get_num_rounds() { return key_Nr; };
   // get the next word in the key schedule
   uint32_t get_next_word();
+  // get the last word in the key schedule
+  uint32_t get_last_word();
 
 private:
   FRIEND_TEST(AESTest128, FirstRoundDecrypt);
@@ -56,7 +58,7 @@ private:
   const size_t key_Nk;
   // linear array of EasyWords, 4 for the start plus 4 for each round
   EasyWord *key_schedule_;
-
+  EasyWord *key_schedule_posterior_;
   // create a key schedule using a 128 bit key
   void generate_128_bit_key_schedule(const vector<uint8_t> &_key);
   // create a key schedule using a 256 bit key
@@ -120,6 +122,9 @@ private:
 
   // Round key is added to the state
   void add_round_key();
+  
+  // Round key is added to the state from the back of the key_schedule
+  void add_round_key_reverse();
 
   // shift state array rows by different offsets
   void shift_rows();
