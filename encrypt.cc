@@ -88,9 +88,9 @@ int main(int argc, char *argv[]) {
 
   ofstream output_file(output_file_name);
   if (output_file.is_open()) {
-	for(int i = 0; i < output.size(); i++) {
-		output_file << output[i];
-	}
+    for (int i = 0; i < output.size(); i++) {
+      output_file << output[i];
+    }
   }
   output_file.close();
 }

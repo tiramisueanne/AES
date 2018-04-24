@@ -343,7 +343,7 @@ void KeyMaster::generate_256_bit_key_schedule(const vector<uint8_t> &_key) {
 // adds four new words to the key_schedule using the previous four
 void KeyMaster::add_four_words(int _ks_idx) {
   // run magic function to generate magic word
-assert(key_Nk > 0);
+  assert(key_Nk > 0);
   uint32_t magic_word =
       schedule_core(key_schedule_[_ks_idx - 1], (int)_ks_idx / key_Nk);
   // add first value
@@ -504,7 +504,7 @@ vector<uint8_t> AES::decrypt_this(vector<uint8_t> &_vectortext) {
 void AES::input_to_state(const vector<uint8_t> &_input) {
   for (uint8_t r = 0; r < 4; r++) {
     for (uint8_t c = 0; c < 4; c++) {
-	state_[r][c] = 0;
+      state_[r][c] = 0;
       state_[r][c] = _input[r + 4 * c];
     }
   }
