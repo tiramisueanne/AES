@@ -1,6 +1,3 @@
-// Copyright 2018 <Singer, Kwatra, Davis> GNU
-#ifndef AES_H_
-#define AES_H_
 #include <stdint.h>
 #include <cmath>
 #include <functional>
@@ -21,14 +18,14 @@ string hex_string(const vector<uint8_t> &bytes);
 // allows for easy access into a uint32_t
 class EasyWord {
  public:
-  EasyWord() {}
-  EasyWord(uint32_t _word) : word_(_word) {}
+  EasyWord(){};
+  EasyWord(uint32_t _word) : word_(_word){};
   EasyWord(uint8_t byte0, uint8_t byte1, uint8_t byte2, uint8_t byte3);
   EasyWord &operator=(uint32_t _word) {
     word_ = _word;
     return *this;
-  }
-  operator uint32_t() const { return word_; }
+  };
+  operator uint32_t() const { return word_; };
 
   // This is big endian
   uint8_t get_byte(int index);
@@ -43,7 +40,7 @@ class KeyMaster {
   KeyMaster(const vector<uint8_t> &_key);
 
   // return the total number of rounds, 10 for 128 bit key, 14 for 256 bit
-  int get_num_rounds() { return key_Nr; }
+  int get_num_rounds() { return key_Nr; };
   // get the next word in the key schedule
   uint32_t get_next_word();
   // get the last word in the key schedule
@@ -108,7 +105,7 @@ class AES {
   FRIEND_TEST(AESTest256, FirstRound);
 
  public:
-  AES(const vector<uint8_t> &_key) : master_(_key), key_hole_(_key){}
+  AES(const vector<uint8_t> &_key) : master_(_key), key_hole_(_key){};
 
   // round function -
   //    for each block of set size
@@ -171,4 +168,3 @@ class AES {
   static const uint8_t mult_13[256];
   static const uint8_t mult_14[256];
 };
-#endif // AES_H_

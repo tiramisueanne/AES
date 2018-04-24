@@ -517,14 +517,14 @@ TEST_F(AESTest256, FullEncrypt) {
 
 TEST_F(AESTest128, CheckFirstKey) {
   machine->input_to_state(ciphertext_);
-  cout << "We are testing input to state" << endl;
+  // cout << "We are testing input to state" << endl;
   check_vector_state(ciphertext_);
 
   // this is the key if we want
 
   vector<uint8_t> check_s =
       string_hex_to_bytes("13111d7fe3944a17f307a78b4d2b30c5");
-  machine->master_.print_key_schedule();
+  // machine->master_.print_key_schedule();
   machine->add_round_key_reverse();
 }
 

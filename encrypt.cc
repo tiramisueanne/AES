@@ -7,7 +7,6 @@
 
 #define DEBUG
 
-using namespace std;
 int main(int argc, char *argv[]) {
   string key_file_name;
   string input_file_name;
