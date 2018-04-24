@@ -5,14 +5,8 @@ compiler: g++
 install: export CXX="g++-5"
 language: cpp
 
-addons:
-  apt:
-    sources:
-    - ubuntu-toolchain-r-test
-    packages:
-    - g++-5
-
 before_install:
+  - sudo apt-get install g++-5
   - sudo unlink /usr/bin/g++ && sudo ln -s /usr/bin/g++-5 /usr/bin/g++
   - g++ --version
   - sudo apt-get update -qq
@@ -28,6 +22,7 @@ before_install:
 script:
   - make
   - make test
+  - make lint-check
 
 notifications:
  email:
