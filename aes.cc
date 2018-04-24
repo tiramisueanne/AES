@@ -400,6 +400,9 @@ uint32_t KeyMaster::sub_word(EasyWord _word) {
   return _word;
 }
 
+// see https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197.pdf
+//   explanation    (p.14-19, 5.1)
+//   implementation (p.15,    5.1)
 vector<uint8_t> AES::encrypt_this(vector<uint8_t> &_vectortext) {
   vector<uint8_t> _outputtext;
 
@@ -442,6 +445,9 @@ vector<uint8_t> AES::encrypt_this(vector<uint8_t> &_vectortext) {
   return _outputtext;
 }
 
+// see https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197.pdf
+//   explanation    (p.20-24, 5.3)
+//   implementation (p.21,    5.3)
 vector<uint8_t> AES::decrypt_this(vector<uint8_t> &_vectortext) {
   vector<uint8_t> _outputtext;
 
@@ -485,6 +491,9 @@ void AES::input_to_state(const vector<uint8_t> &_input) {
   }
 }
 
+// see https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197.pdf
+//   explanation    (p.18-19,   5.1.4)
+//   explanation    (p.23,      5.3.4)
 void AES::add_round_key() {
   for (int word = 0; word < 4; word++) {
     EasyWord next_word = master_.get_next_word();
@@ -516,11 +525,8 @@ void AES::matrix_multiply(function<uint8_t(uint8_t)> matrix[4][4]) {
   }
 }
 
-// bytes in the last three rows of state_ are shifted by different offsets
-// s0,0   s0,1    s0,2    s0,3           s0,0   s0,1    s0,2    s0,3
-// s1,0   s1,1    s1,2    s1,3    --->   s1,1   s1,2    s1,3    s1,0  (offset 1)
-// s2,0   s2,1    s2,2    s2,3    --->   s2,2   s2,3    s2,0    s2,1  (offset 2)
-// s3,0   s3,1    s3,2    s3,3           s3,3   s3,0    s3,1    s3,2  (offset 3)
+// see https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197.pdf
+//   explanation    (p.17,    5.1.2)
 void AES::shift_rows() {
   uint8_t new_state[4][4] = {
       {state_[0][0], state_[0][1], state_[0][2], state_[0][3]},
@@ -534,12 +540,8 @@ void AES::shift_rows() {
   }
 }
 
-// bytes in the last three rows of state_ are shifted by different offsets
-// s0,0   s0,1    s0,2    s0,3           s0,0   s0,1    s0,2    s0,3
-// s1,0   s1,1    s1,2    s1,3    --->   s1,3   s1,0    s1,1    s1,2  (offset 3)
-// s2,0   s2,1    s2,2    s2,3    --->   s2,2   s2,3    s2,0    s2,1  (offset 2)
-// s3,0   s3,1    s3,2    s3,3           s3,1   s3,2    s3,3    s3,0  (offset 1)
-// offset above references offset to left (not inv_shift_rows to the right)
+// see https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197.pdf
+//   explanation    (p.21-22,   5.3.1)
 void AES::inv_shift_rows() {
   uint8_t new_state[4][4] = {
       {state_[0][0], state_[0][1], state_[0][2], state_[0][3]},
@@ -553,6 +555,8 @@ void AES::inv_shift_rows() {
   }
 }
 
+// see https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197.pdf
+//   explanation    (p.17-18,   5.1.3)
 void AES::mix_columns() {
   function<uint8_t(uint8_t)> multiply_1 = [&](uint8_t x) { return x; };
   function<uint8_t(uint8_t)> multiply_2 = [&](uint8_t x) {
@@ -570,6 +574,8 @@ void AES::mix_columns() {
   matrix_multiply(mult_by_mat);
 }
 
+// see https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197.pdf
+//   explanation    (p.23,   5.3.3)
 void AES::inv_mix_columns() {
   function<uint8_t(uint8_t)> multiply_9 = [&](uint8_t x) { return mult_9[x]; };
   function<uint8_t(uint8_t)> multiply_14 = [&](uint8_t x) { return mult_14[x]; };
@@ -583,6 +589,8 @@ void AES::inv_mix_columns() {
   matrix_multiply(mult_by_mat);
 }
 
+// see https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197.pdf
+//   explanation    (p.15-16,   5.1.1)
 void AES::sub_bytes() {
   // use the value within the state to index into S-box
   // then, assign current cell in state to value in S-box
@@ -594,6 +602,8 @@ void AES::sub_bytes() {
   }
 }
 
+// see https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197.pdf
+//   explanation    (p.22,   5.3.2)
 void AES::inv_sub_bytes() {
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j < 4; j++) {

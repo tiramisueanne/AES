@@ -78,18 +78,18 @@ private:
 };
 
 class AES {
-  friend struct AesTest;
-  FRIEND_TEST(AesTest, InitState);
-  FRIEND_TEST(AesTest, InitKey);
-  FRIEND_TEST(AesTest, FirstRound);
-  FRIEND_TEST(AesTest, ShiftRows);
-  FRIEND_TEST(AesTest, InvShiftRows);
-  FRIEND_TEST(AesTest, ShiftInvShiftRows);
-  FRIEND_TEST(AesTest, MixColumn);
-  FRIEND_TEST(AesTest, BasicSubBytes);
-  FRIEND_TEST(AesTest, SubBytes);
-  FRIEND_TEST(AesTest, BasicInvSubBytes);
-  FRIEND_TEST(AesTest, InvSubBytes);
+  friend struct AESTest128;
+  FRIEND_TEST(AESTest128, InitState);
+  FRIEND_TEST(AESTest128, InitKey);
+  FRIEND_TEST(AESTest128, FirstRound);
+  FRIEND_TEST(AESTest128, ShiftRows);
+  FRIEND_TEST(AESTest128, InvShiftRows);
+  FRIEND_TEST(AESTest128, ShiftInvShiftRows);
+  FRIEND_TEST(AESTest128, MixColumn);
+  FRIEND_TEST(AESTest128, BasicSubBytes);
+  FRIEND_TEST(AESTest128, SubBytes);
+  FRIEND_TEST(AESTest128, BasicInvSubBytes);
+  FRIEND_TEST(AESTest128, InvSubBytes);
 
 public:
   AES(const vector<uint8_t> &_key) : master_(_key){};
