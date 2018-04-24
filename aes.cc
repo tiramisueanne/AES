@@ -294,7 +294,7 @@ uint32_t KeyMaster::get_next_word() {
 
 // create a key schedule using a 128 bit key
 void KeyMaster::generate_128_bit_key_schedule(const vector<uint8_t> &_key) {
-  
+
   // add inital four words to key schedule
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j < 4; j++) {
@@ -310,7 +310,7 @@ void KeyMaster::generate_128_bit_key_schedule(const vector<uint8_t> &_key) {
 
 // create a key schedule using a 256 bit key
 void KeyMaster::generate_256_bit_key_schedule(const vector<uint8_t> &_key) {
-  
+
   // add initial eight words to key schedule
   for (int i = 0; i < 8; i++) {
     for (int j = 0; j < 4; j++) {
@@ -598,7 +598,7 @@ void AES::inv_sub_bytes() {
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j < 4; j++) {
       int index = static_cast<int>(state_[i][j]);
-      state_[i][j] = S_TABLE[index];
+      state_[i][j] = INV_S_TABLE[index];
     }
   }
 }

@@ -88,6 +88,8 @@ class AES {
   FRIEND_TEST(AesTest, MixColumn);
   FRIEND_TEST(AesTest, BasicSubBytes);
   FRIEND_TEST(AesTest, SubBytes);
+  FRIEND_TEST(AesTest, BasicInvSubBytes);
+  FRIEND_TEST(AesTest, InvSubBytes);
 
 public:
   AES(const vector<uint8_t> &_key) : master_(_key){};

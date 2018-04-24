@@ -378,6 +378,60 @@ TEST_F(AesTest, SubBytes) {
   }
 }
 
+TEST_F(AesTest, BasicInvSubBytes) {
+  uint8_t state[4][4] = {
+    {0x0, 0x0, 0x0, 0x0},
+    {0x0, 0x0, 0x0, 0x0},
+    {0x0, 0x0, 0x0, 0x0},
+    {0x0, 0x0, 0x0, 0x0}
+  };
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 4; j++) {
+      machine->state_[i][j] = state[i][j];
+    }
+  }
+
+  machine->inv_sub_bytes();
+
+  for(int col = 0; col < 4; col++) {
+      for(int row  = 0; row < 4; row++) {
+          EXPECT_EQ(machine->state_[row][col], 0x52);
+      }
+  }
+}
+
+TEST_F(AesTest, InvSubBytes) {
+
+  uint8_t state[4][4] = {
+    {0x58, 0xEB, 0x80, 0xAE},
+    {0x25, 0x15, 0xF1, 0xFE},
+    {0xF9, 0x5C, 0xAB, 0x83},
+    {0xED, 0x11, 0x99, 0x54}
+  };
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 4; j++) {
+      machine->state_[i][j] = state[i][j];
+    }
+  }
+
+  machine->inv_sub_bytes();
+
+  // calculated by hand using S-box figure in
+  // https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197.pdf
+  //    (p.16, 5.1.1)
+  uint8_t expected_state[4][4] = {
+    {0x5E, 0x3C, 0x3A, 0xBE},
+    {0xC2, 0x2F, 0x2B, 0x0C},
+    {0x69, 0xA7, 0x0E, 0x41},
+    {0x53, 0xE3, 0xF9, 0xFD}
+  };
+
+  for(int col = 0; col < 4; col++) {
+      for(int row  = 0; row < 4; row++) {
+          EXPECT_EQ(machine->state_[row][col], expected_state[row][col]);
+      }
+  }
+}
 
 TEST_F(AesTest, FirstRound) {
     vector<uint8_t> start_ = AesTest::string_hex_to_bytes("00102030405060708090a0b0c0d0e0f0");
