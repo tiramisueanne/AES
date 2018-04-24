@@ -589,3 +589,12 @@ TEST_F(AESTest128, FullDecrypt) {
         EXPECT_EQ(dec[i], text_[i]);            
     }
 }
+
+TEST_F(AESTest256, FullDecrypt) {
+    vector<uint8_t> cipher_ =  string_hex_to_bytes("dda97ca4864cdfe06eaf70a0ec0d7191");
+    vector<uint8_t> check_plain_ = machine->decrypt_this(cipher_);
+	vector<uint8_t> plain_ = string_hex_to_bytes("00112233445566778899aabbccddeeff");
+    for(int i = 0; i < 16; i++) {
+        EXPECT_EQ(check_plain_[i], plain_[i]);
+    }
+}
