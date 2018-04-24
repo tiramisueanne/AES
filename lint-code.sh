@@ -1,2 +1,2 @@
-clang-format -i *.cc
-clang-format -i *.h
+clang-format -i -style=google *.cc
+clang-format -i -style=google *.h
