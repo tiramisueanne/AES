@@ -11,7 +11,7 @@ To learn more about AES, see:
 ## Algorithm
 The AES algorithm encrypts a message in fixed-size blocks using shared key of length 128, 192, or 256 bits. Based on the key size used, AES runs a number of "rounds," which each includes substitution, transposition, and mixing steps. Our implementation only employs keys of length 128 and 256 bits.
 
-We implement the AES algorithm in ```aes.cc```. Plaintext for encrypting and encrypted text for decrypting are passed into the ```AES``` class's ```encrypt_this``` and ```decrypt_this``` methods via an ```encrypt.cc```-defined text-based user interface.
+We implement the AES algorithm in ```aes.cc```. Data to encrypt or decrypt, and input and output files, are passed into the ```AES``` class's ```encrypt_this``` and ```decrypt_this``` methods via command line arguments.
 
 We implement three classes, ```KeyMaster```, which handles everything related to the given key, including rotation, addition, and constants that rely on key length; ```EasyWord```, which performs operations on words, such as getting and setting byte values; and ```AES```, which performs encryption and decryption.
 
@@ -20,6 +20,13 @@ We implement three classes, ```KeyMaster```, which handles everything related to
 ### EasyWord
 
 ### AES
+The ```AES``` class performs the core of the AES algorithm. AES's ```encrypt_this``` method takes in data via its ```_vectortext``` parameter and pads the input with 0s until it reaches a length divisible by 16, creating a string of data that can be evenly split into 128 bit blocks.
+
+Then, ```encrypt_this``` puts each block into a state matrix and performs a series of transformations on the state. Given a number of rounds (from KeyMaster), the method performs byte substitution, row shifting, column mixing, and round key adding, over and over. Finally, it performs a single round without column mixing and returns the encrypted text.
+
+For decryption, ```decrypt_this``` also puts its input blocks into state and performs a series of (inverse) transformations on the state. Given a number of rounds, it runs inverse row shifting, inverse byte substitution, round key addition, and inverse column mixing. On its final round, it similarly performs all of the above steps without mixing columns. It then returns the decrypted text.
+
+Each of the canonical encryption and decryption methods are commented with references to their definition and explication in the NIST technical specifications. In an effort to improve our algorithm's expedience and simplicity, many of our methods, including row shifting, byte substitution, and column mixing are hardcoded. Though normally, this design choice would be frowned upon, in this case, our algorithm works as a black box – receiving input text to encrypt and decrypt and returning its results. Thus, at the top of ```aes.cc```, we define ```S_TABLE```, ```INV_S_TABLE```, and several ```mult``` arrays.  
 
 ## Running AES
 
