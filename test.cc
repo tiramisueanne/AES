@@ -288,6 +288,40 @@ TEST_F(AesTest, ShiftInvShiftRows) {
     }
 }
 
+TEST_F(AesTest, MixColumn) {
+    uint8_t new_state[4][4] = {
+    {0xd4, 0, 0, 0}, 
+    {0xbf, 0, 0, 0}, 
+    {0x5d, 0, 0, 0},
+    {0x30, 0, 0, 0}
+    };
+    for (int i = 0; i < 4; i++) {
+      for (int j = 0; j < 4; j++) {
+        machine->state_[i][j] = new_state[i][j];
+      }
+    }
+
+    vector<uint8_t> correct_col = {0x04, 0x66, 0x81, 0xe5};
+    function<uint8_t(uint8_t)> multiply_1 = [](uint8_t x) { return x; };
+    function<uint8_t(uint8_t)> multiply_2 = [](uint8_t x) {
+        return AES::mult_2[(int)x];
+    };
+    function<uint8_t(uint8_t)> multiply_3 = [](uint8_t x) {
+        return AES::mult_3[(int)x];
+    };
+
+    //this is the mix_Column matrix
+    function<uint8_t(uint8_t)> mult_by_mat[4][4] = {
+      {multiply_2, multiply_3, multiply_1, multiply_1},
+      {multiply_1, multiply_2, multiply_3, multiply_1},
+      {multiply_1, multiply_1, multiply_2, multiply_3},
+      {multiply_3, multiply_1, multiply_1, multiply_2}};
+    vector<uint8_t> check = machine->multiply_column(mult_by_mat, 0);
+    for(int i = 0; i < 4; i++) {
+        EXPECT_EQ(check[i], correct_col[i]);
+    }
+}
+
 
 TEST_F(AesTest, FirstRound) {
     vector<uint8_t> start_ = AesTest::string_hex_to_bytes("00102030405060708090a0b0c0d0e0f0");

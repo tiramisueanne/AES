@@ -85,6 +85,7 @@ class AES {
   FRIEND_TEST(AesTest, ShiftRows);
   FRIEND_TEST(AesTest, InvShiftRows);
   FRIEND_TEST(AesTest, ShiftInvShiftRows);
+  FRIEND_TEST(AesTest, MixColumn);
 
 public:
   AES(const vector<uint8_t> &_key) : master_(_key){};
@@ -119,6 +120,8 @@ private:
   // inverse of shift_rows
   void inv_shift_rows();
 
+  vector<uint8_t> multiply_column(function<uint8_t(uint8_t)> matrix[4][4], int col_index);
+
   // multiplies matricies
   void matrix_multiply(function<uint8_t(uint8_t)> matrix[4][4]);
 
@@ -135,4 +138,11 @@ private:
 
   // moves ((block length) / 32) bytes of state array to output
   vector<uint8_t> state_to_output();
+
+  static const uint8_t mult_2[256];  
+  static const uint8_t mult_3[256];  
+  static const uint8_t mult_9[256];  
+  static const uint8_t mult_11[256];  
+  static const uint8_t mult_13[256];  
+  static const uint8_t mult_14[256];  
 };
