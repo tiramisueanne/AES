@@ -44,10 +44,6 @@ public:
   // get the next word in the key schedule
   uint32_t get_next_word();
 
-  ~KeyMaster() {
-    delete []  key_schedule_;
-  };
-
 private:
   // number of rounds ( 128 bit - 10 | 256 bit - 14 )
   const size_t key_Nr;
@@ -79,6 +75,7 @@ private:
 
 class AES {
   friend struct AESTest128;
+  friend struct AESTest256;
   FRIEND_TEST(AESTest128, InitState);
   FRIEND_TEST(AESTest128, InitKey);
   FRIEND_TEST(AESTest128, FirstRound);
@@ -90,6 +87,7 @@ class AES {
   FRIEND_TEST(AESTest128, SubBytes);
   FRIEND_TEST(AESTest128, BasicInvSubBytes);
   FRIEND_TEST(AESTest128, InvSubBytes);
+  FRIEND_TEST(AESTest256, FullEncrypt); 
 
 public:
   AES(const vector<uint8_t> &_key) : master_(_key){};
