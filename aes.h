@@ -45,6 +45,9 @@ public:
   uint32_t get_next_word();
 
 private:
+  FRIEND_TEST(AESTest128, FirstRoundDecrypt);
+  FRIEND_TEST(AESTest128, CheckFirstKey);
+
   // number of rounds ( 128 bit - 10 | 256 bit - 14 )
   const size_t key_Nr;
   // number of words in a state ( 128 bit - 4 | 256 bit - 4 )
