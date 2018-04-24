@@ -549,34 +549,34 @@ TEST_F(AESTest128, CheckFirstKey) {
 
 TEST_F(AESTest128, FirstRoundDecrypt) {
     machine->input_to_state(ciphertext_);
-    cout << "We are testing input to state" << endl;
+    //cout << "We are testing input to state" << endl;
     check_vector_state(ciphertext_); 
 
     machine->add_round_key_reverse();
 
-    cout << "We are about to check whether the state makes sense" << endl;
+    //cout << "We are about to check whether the state makes sense" << endl;
     vector<uint8_t> check_string = string_hex_to_bytes("7ad5fda789ef4e272bca100b3d9ff59f");
     check_vector_state(check_string);
 
-    cout << "Inverse shift rows" << endl;
+    //cout << "Inverse shift rows" << endl;
     machine->inv_shift_rows();
     vector<uint8_t> inv_shift_row = string_hex_to_bytes("7a9f102789d5f50b2beffd9f3dca4ea7");
     check_vector_state(inv_shift_row);
 
 
-    cout << "We are about to try inv_sub" << endl;
+    //cout << "We are about to try inv_sub" << endl;
     vector<uint8_t> inv_s_box = string_hex_to_bytes("bd6e7c3df2b5779e0b61216e8b10b689");
     ASSERT_EQ(inv_s_box.size(), 16);
     machine->inv_sub_bytes();
     check_vector_state(inv_s_box);
     
-    cout << "We are about to try add_round_key " << endl;
+    //cout << "We are about to try add_round_key " << endl;
     machine->add_round_key_reverse();
     vector<uint8_t> add_key = string_hex_to_bytes("e9f74eec023020f61bf2ccf2353c21c7");
     check_vector_state(add_key);
     
 
-    cout << "We are about to inv mix columns" << endl; 
+    //cout << "We are about to inv mix columns" << endl; 
     machine->inv_mix_columns();
     vector<uint8_t> inv_mix_columns = string_hex_to_bytes("54d990a16ba09ab596bbf40ea111702f");
     check_vector_state(inv_mix_columns);

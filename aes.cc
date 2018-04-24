@@ -493,7 +493,7 @@ vector<uint8_t> AES::decrypt_this(vector<uint8_t> &_vectortext) {
     vector<uint8_t> block_output = state_to_output();
     for (uint8_t j = 0; j < block_output.size(); j++) {
       _outputtext.push_back(block_output[j]);
-      cout << block_output[j];
+      //cout << block_output[j];
     }
   }
   return _outputtext;
