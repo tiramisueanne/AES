@@ -7,7 +7,7 @@
 #include "aes.h"
 
 using namespace std;
-//#define FIX_256
+#define FIX_256
 
 TEST(StringToByteVectorTest, CharCompare) {
   string sample = "Thats my Kung Fu";
@@ -136,7 +136,6 @@ TEST_F(KeyMasterTest, RoundKeys256Bit){
   EXPECT_EQ(longmaster->get_next_word(), 0xE6188D0B);
   EXPECT_EQ(longmaster->get_next_word(), 0x046DF344);
   EXPECT_EQ(longmaster->get_next_word(), 0x706C631E);
-  delete longmaster;
 }
 #endif
 
@@ -147,8 +146,8 @@ struct AESTest128 : testing::Test {
                 ASSERT_EQ(machine->state_[row][col], vec[row + col*4]);
             }
         }
-
     }
+
     static vector<uint8_t> string_hex_to_bytes(string _hex) {
         vector<uint8_t> bytes_;
         for(int i = 0; i <  _hex.size() -1; i+=2) {
@@ -290,10 +289,10 @@ TEST_F(AESTest128, ShiftInvShiftRows) {
 
 TEST_F(AESTest128, MixColumn) {
     uint8_t new_state[4][4] = {
-    {0xd4, 0, 0, 0},
-    {0xbf, 0, 0, 0},
-    {0x5d, 0, 0, 0},
-    {0x30, 0, 0, 0}
+      {0xd4, 0, 0, 0},
+      {0xbf, 0, 0, 0},
+      {0x5d, 0, 0, 0},
+      {0x30, 0, 0, 0}
     };
     for (int i = 0; i < 4; i++) {
       for (int j = 0; j < 4; j++) {
@@ -322,6 +321,115 @@ TEST_F(AESTest128, MixColumn) {
     }
 }
 
+TEST_F(AESTest128, BasicSubBytes) {
+  uint8_t state[4][4] = {
+    {0x0, 0x0, 0x0, 0x0},
+    {0x0, 0x0, 0x0, 0x0},
+    {0x0, 0x0, 0x0, 0x0},
+    {0x0, 0x0, 0x0, 0x0}
+  };
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 4; j++) {
+      machine->state_[i][j] = state[i][j];
+    }
+  }
+
+  machine->sub_bytes();
+
+  for(int col = 0; col < 4; col++) {
+      for(int row  = 0; row < 4; row++) {
+          EXPECT_EQ(machine->state_[row][col], 0x63);
+      }
+  }
+}
+
+TEST_F(AESTest128, SubBytes) {
+
+  uint8_t state[4][4] = {
+    {0xA6, 0x4F, 0x4B, 0x34},
+    {0x79, 0x04, 0x5F, 0x14},
+    {0xFA, 0x56, 0xB0, 0x20},
+    {0x5F, 0x0A, 0x54, 0xD2}
+  };
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 4; j++) {
+      machine->state_[i][j] = state[i][j];
+    }
+  }
+
+  machine->sub_bytes();
+
+  // calculated by hand using S-box figure in
+  // https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197.pdf
+  //    (p.16, 5.1.1)
+  uint8_t expected_state[4][4] = {
+    {0x24, 0x84, 0xB3, 0x18},
+    {0xB6, 0xF2, 0xCF, 0xFA},
+    {0x2D, 0xB1, 0xE7, 0xB7},
+    {0xCF, 0x67, 0x20, 0xB5}
+  };
+
+  for(int col = 0; col < 4; col++) {
+      for(int row  = 0; row < 4; row++) {
+          EXPECT_EQ(machine->state_[row][col], expected_state[row][col]);
+      }
+  }
+}
+
+TEST_F(AESTest128, BasicInvSubBytes) {
+  uint8_t state[4][4] = {
+    {0x0, 0x0, 0x0, 0x0},
+    {0x0, 0x0, 0x0, 0x0},
+    {0x0, 0x0, 0x0, 0x0},
+    {0x0, 0x0, 0x0, 0x0}
+  };
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 4; j++) {
+      machine->state_[i][j] = state[i][j];
+    }
+  }
+
+  machine->inv_sub_bytes();
+
+  for(int col = 0; col < 4; col++) {
+      for(int row  = 0; row < 4; row++) {
+          EXPECT_EQ(machine->state_[row][col], 0x52);
+      }
+  }
+}
+
+TEST_F(AESTest128, InvSubBytes) {
+
+  uint8_t state[4][4] = {
+    {0x58, 0xEB, 0x80, 0xAE},
+    {0x25, 0x15, 0xF1, 0xFE},
+    {0xF9, 0x5C, 0xAB, 0x83},
+    {0xED, 0x11, 0x99, 0x54}
+  };
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 4; j++) {
+      machine->state_[i][j] = state[i][j];
+    }
+  }
+
+  machine->inv_sub_bytes();
+
+  // calculated by hand using S-box figure in
+  // https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197.pdf
+  //    (p.16, 5.1.1)
+  uint8_t expected_state[4][4] = {
+    {0x5E, 0x3C, 0x3A, 0xBE},
+    {0xC2, 0x2F, 0x2B, 0x0C},
+    {0x69, 0xA7, 0x0E, 0x41},
+    {0x53, 0xE3, 0xF9, 0xFD}
+  };
+
+  for(int col = 0; col < 4; col++) {
+      for(int row  = 0; row < 4; row++) {
+          EXPECT_EQ(machine->state_[row][col], expected_state[row][col]);
+      }
+  }
+}
 
 TEST_F(AESTest128, FirstRound) {
     vector<uint8_t> start_ = AESTest128::string_hex_to_bytes("00102030405060708090a0b0c0d0e0f0");
@@ -335,23 +443,22 @@ TEST_F(AESTest128, FirstRound) {
     vector<uint8_t> s_box = string_hex_to_bytes("63cab7040953d051cd60e0e7ba70e18c");
     ASSERT_EQ(s_box.size(), 16);
     machine->sub_bytes();
-    cout << "Check sub_bytes" << endl;
     for(int col = 0; col < 4; col++) {
         for(int row = 0; row < 4; row++) {
             ASSERT_EQ(machine->state_[row][col], s_box[row + col*4]);
         }
     }
-    cout << "Check shift_rows" << endl;
+
     machine->shift_rows();
     vector<uint8_t> shift_row = string_hex_to_bytes("6353e08c0960e104cd70b751bacad0e7");
     check_vector_state(shift_row);
 
-    cout << "Check_mix_columns" << endl;
     machine->mix_columns();
     vector<uint8_t> mix_columns = string_hex_to_bytes("5f72641557f5bc92f7be3b291db9f91a");
     check_vector_state(mix_columns);
 
-    cout << "End of round 1" << endl;
+    machine->add_round_key();
+
     //checking the start of the next thing, which is after checking round_key
     vector<uint8_t> end_first = string_hex_to_bytes("89d810e8855ace682d1843d8cb128fe4");
     for(int col = 0; col < 4; col++) {

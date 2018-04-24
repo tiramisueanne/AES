@@ -274,7 +274,7 @@ void EasyWord::set_byte(int index, uint8_t _val) {
 KeyMaster::KeyMaster(const vector<uint8_t> &_key)
     : key_Nb(4), key_Nk(_key.size() / key_Nb),
       key_Nr(_key.size() == 16 ? 10 : 14) {
-  key_schedule_ = new EasyWord[key_Nb * (key_Nr + 1)];
+  key_schedule_ = new EasyWord[(key_Nb * (key_Nr + 1))+4];
 
   // detect key size and generate appropriate key schedule
   if(key_Nr == 10){
@@ -608,7 +608,7 @@ void AES::inv_sub_bytes() {
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j < 4; j++) {
       int index = static_cast<int>(state_[i][j]);
-      state_[i][j] = S_TABLE[index];
+      state_[i][j] = INV_S_TABLE[index];
     }
   }
 }

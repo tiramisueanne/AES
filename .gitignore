@@ -2,6 +2,7 @@
 aes
 tui
 test
+test.dSYM/*
 
 # Prerequisites
 *.d
