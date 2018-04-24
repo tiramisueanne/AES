@@ -1,6 +1,7 @@
 // Copyright 2018 <Singer, Kwatra, Davis> GNU
 #ifndef AES_H_
 #define AES_H_
+
 #include <stdint.h>
 #include <cmath>
 #include <functional>
@@ -108,7 +109,7 @@ class AES {
   FRIEND_TEST(AESTest256, FirstRound);
 
  public:
-  AES(const vector<uint8_t> &_key) : master_(_key), key_hole_(_key){}
+  AES(const vector<uint8_t> &_key) : master_(_key), key_hole_(_key) {}
 
   // round function -
   //    for each block of set size
@@ -171,4 +172,5 @@ class AES {
   static const uint8_t mult_13[256];
   static const uint8_t mult_14[256];
 };
-#endif // AES_H_
+
+#endif  // AES_H_

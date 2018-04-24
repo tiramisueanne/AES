@@ -8,7 +8,6 @@ EXEC=aes
 # type in "make" to run the program
 all: $(BASE)
 	chmod +x lint-check.sh
-	chmod +x lint-code.sh
 	g++ -std=c++14 $(BASE) -o $(EXEC)
 
 # type in "make run" to run the program
