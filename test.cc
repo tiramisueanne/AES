@@ -477,3 +477,58 @@ TEST_F(AESTest128, FullEncrypt) {
         EXPECT_EQ(end_encrypt[i], encrypted[i]);
     }
 }
+struct AESTest256 : testing::Test {
+
+    void check_vector_state(vector<uint8_t> vec) {
+        for(int col = 0; col < 4; col++) {
+            for(int row = 0; row < 4; row++) {
+                ASSERT_EQ(machine->state_[row][col], vec[row + col*4]);
+            }
+        }
+    }
+
+    static vector<uint8_t> string_hex_to_bytes(string _hex) {
+        vector<uint8_t> bytes_;
+        for(int i = 0; i <  _hex.size() -1; i+=2) {
+           string hex_ = "";
+           hex_ += {_hex[i], _hex[i+1]};
+           //cout << "hex_" << hex_ << endl;
+           stringstream ss;
+           ss << hex_;
+           int x;
+           ss >> hex >> x;
+           uint8_t to_place = x;
+           bytes_.emplace_back(to_place);
+        }
+        return bytes_;
+    }
+
+    AES *machine;
+    string plaintext = "00112233445566778899aabbccddeeff";
+    vector<uint8_t> text_ = string_hex_to_bytes(plaintext);
+    //TODO: This is buggy
+
+    static vector<EasyWord> bytes_to_words(vector<uint8_t> bytes_) {
+        /*
+        vector<EasyWord> _words;
+        for(int i = 0; i <
+        */
+        return vector<EasyWord>();
+    }
+    virtual void SetUp() {
+        string FIPS_256 = "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f";
+        vector<uint8_t> key_256 = string_hex_to_bytes(FIPS_256);
+        machine = new AES(key_256);
+    }
+
+    virtual void TearDown() {
+        //delete machine;
+    };
+};
+TEST_F(AESTest256, FullEncrypt) {
+    vector<uint8_t> end_encrypt = AESTest256::string_hex_to_bytes("8ea2b7ca516745bfeafc49904b496089");
+    vector<uint8_t> encrypted = machine->encrypt_this(text_);
+    for(int i = 0; i < 4; i++) {
+        EXPECT_EQ(end_encrypt[i], encrypted[i]);
+    }
+}
