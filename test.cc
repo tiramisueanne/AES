@@ -167,6 +167,7 @@ struct AESTest128 : testing::Test {
     AES *machine;
     string plaintext = "00112233445566778899aabbccddeeff";
     vector<uint8_t> text_ = string_hex_to_bytes(plaintext);
+    vector<uint8_t> ciphertext_ = string_hex_to_bytes("69c4e0d86a7b0430d8cdb78070b4c55a");
     //TODO: This is buggy
 
     static vector<EasyWord> bytes_to_words(vector<uint8_t> bytes_) {
@@ -531,4 +532,69 @@ TEST_F(AESTest256, FullEncrypt) {
     for(int i = 0; i < 4; i++) {
         EXPECT_EQ(end_encrypt[i], encrypted[i]);
     }
+
 }
+
+TEST_F(AESTest128, CheckFirstKey) {
+    machine->input_to_state(ciphertext_);
+    cout << "We are testing input to state" << endl;
+    check_vector_state(ciphertext_); 
+
+    //this is the key if we want    
+    
+    vector<uint8_t> check_s = string_hex_to_bytes("13111d7fe3944a17f307a78b4d2b30c5");
+    //TODO: fix me!
+    machine->add_round_key();
+    for(int i = 0; i < 16; i++) {
+        //might be 4- i%4
+        cout << "The key state is " << (machine->master_.key_schedule_[i/4]).get_byte(i%4) << endl;
+        EXPECT_EQ((machine->master_.key_schedule_[i/4]).get_byte(i%4), check_s[i]);
+    }
+
+}
+
+TEST_F(AESTest128, FirstRoundDecrypt) {
+    machine->input_to_state(ciphertext_);
+    cout << "We are testing input to state" << endl;
+    check_vector_state(ciphertext_); 
+
+    machine->add_round_key();
+
+    cout << "We are about to check whether the state makes sense" << endl;
+    vector<uint8_t> check_string = string_hex_to_bytes("7ad5fda789ef4e272bca100b3d9ff59f");
+    check_vector_state(check_string);
+
+    cout << "Inverse shift rows" << endl;
+    machine->inv_shift_rows();
+    vector<uint8_t> inv_shift_row = string_hex_to_bytes("7a9f102789d5f50b2beffd9f3dca4ea7");
+    check_vector_state(inv_shift_row);
+
+
+    cout << "We are about to try inv_sub" << endl;
+    vector<uint8_t> inv_s_box = string_hex_to_bytes("bd6e7c3df2b5779e0b61216e8b10b689");
+    ASSERT_EQ(inv_s_box.size(), 16);
+    machine->inv_sub_bytes();
+    check_vector_state(inv_s_box);
+    
+    cout << "We are about to try add_round_key " << endl;
+    machine->add_round_key();
+    vector<uint8_t> add_key = string_hex_to_bytes("e9f74eec023020f61bf2ccf2353c21c7");
+    check_vector_state(add_key);
+    
+
+    cout << "We are about to inv mix columns" << endl; 
+    machine->inv_mix_columns();
+    vector<uint8_t> inv_mix_columns = string_hex_to_bytes("54d990a16ba09ab596bbf40ea111702f");
+    check_vector_state(inv_mix_columns);
+
+
+    //checking the start of the next thing, which is after checking round_key
+    vector<uint8_t> end_first = string_hex_to_bytes("89d810e8855ace682d1843d8cb128fe4");
+    for(int col = 0; col < 4; col++) {
+        for(int row = 0; row < 4; row++) {
+            ASSERT_EQ(machine->state_[row][col], end_first[row + col*4]);
+        }
+    }
+}
+
+
