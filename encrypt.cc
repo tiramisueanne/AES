@@ -1,8 +1,9 @@
+// Copyright 2018 <Singer, Kwatra, Davis> GNU
 #include <fstream>
 #include <iostream>
 #include <string>
 
-#include "aes.h"
+#include "./aes.h"
 
 #define DEBUG
 

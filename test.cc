@@ -1,3 +1,4 @@
+// Copyright 2018 <Singer, Kwatra, Davis> GNU
 #include <bitset>
 #include <cstdint>
 #include <iostream>

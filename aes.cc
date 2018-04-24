@@ -1,3 +1,4 @@
+// Copyright 2018 <Singer, Kwatra, Davis> GNU
 #include <stdint.h>
 #include <cassert>
 #include <cmath>
@@ -7,7 +8,7 @@
 #include <sstream>
 #include <vector>
 
-#include "aes.h"
+#include "./aes.h"
 using namespace std;
 
 const uint8_t S_TABLE[256] = {
@@ -240,7 +241,7 @@ vector<uint8_t> string_to_byte_vector(string input) {
 string hex_string(const vector<uint8_t> &bytes) {
   stringstream hex_bytes_;
   for (int i = 0; i < bytes.size(); i++) {
-    hex_bytes_ << hex << (int)bytes[i];
+    hex_bytes_ << hex << (int)(bytes[i]);
   }
   return hex_bytes_.str();
 }
@@ -345,7 +346,7 @@ void KeyMaster::add_four_words(int _ks_idx) {
   // run magic function to generate magic word
   assert(key_Nk > 0);
   uint32_t magic_word =
-      schedule_core(key_schedule_[_ks_idx - 1], (int)_ks_idx / key_Nk);
+      schedule_core(key_schedule_[_ks_idx - 1], reinterpret_cast<int>(_ks_idx)/ key_Nk);
   // add first value
   key_schedule_[_ks_idx] = key_schedule_[_ks_idx - 4] ^ magic_word;
   // add second value
@@ -363,7 +364,7 @@ void KeyMaster::add_four_words(int _ks_idx) {
 void KeyMaster::add_eight_words(int _ks_idx) {
   // run magic function to generate magic word
   uint32_t magic_word =
-      schedule_core(key_schedule_[_ks_idx - 1], (int)_ks_idx / key_Nk);
+      schedule_core(key_schedule_[_ks_idx - 1], reinterpret_cast<int>(_ks_idx) / key_Nk);
   // add first value
   key_schedule_[_ks_idx] = key_schedule_[_ks_idx - 8] ^ magic_word;
   // add second value
@@ -593,10 +594,10 @@ void AES::inv_shift_rows() {
 void AES::mix_columns() {
   function<uint8_t(uint8_t)> multiply_1 = [&](uint8_t x) { return x; };
   function<uint8_t(uint8_t)> multiply_2 = [&](uint8_t x) {
-    return mult_2[(int)x];
+    return mult_2[x];
   };
   function<uint8_t(uint8_t)> multiply_3 = [&](uint8_t x) {
-    return mult_3[(int)x];
+    return mult_3[x];
   };
   // given in whitepaper
   function<uint8_t(uint8_t)> mult_by_mat[4][4] = {
