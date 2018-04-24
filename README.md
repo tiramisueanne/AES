@@ -11,15 +11,23 @@ To learn more about AES, see:
 ## Algorithm
 The AES algorithm encrypts a message in fixed-size blocks using shared key of length 128, 192, or 256 bits. Based on the key size used, AES runs a number of "rounds," which each includes substitution, transposition, and mixing steps. Our implementation only employs keys of length 128 and 256 bits.
 
-We implement the AES algorithm in ```aes.cc```. Plaintext for encrypting and encrypted text for decrypting are passed into the ```AES``` class's ```encrypt_this``` and ```decrypt_this``` methods via an ```encrypt.cc```-defined text-based user interface.
+We implement the AES algorithm in ```aes.cc```. Data to encrypt or decrypt, and input and output files, are passed into the ```AES``` class's ```encrypt_this``` and ```decrypt_this``` methods via command line arguments.
 
 We implement three classes, ```KeyMaster```, which handles everything related to the given key, including rotation, addition, and constants that rely on key length; ```EasyWord```, which performs operations on words, such as getting and setting byte values; and ```AES```, which performs encryption and decryption.
 
 ### KeyMaster
-
+The ```KeyMaster``` class abstracts away the key expansion process. ```KeyMaster``` can take in either a 128 or 256 bit key and performs the related operations. The ```KeyMaster``` needs to generate a key schedule to provide words, four of which constitute a single round key. These round keys are XOR'd with the current state through the method ```add_round_key```. In this implementation, we use ```get_next_word```, which acts as an iterator through the key schedule. ```add_round_key``` will call ```get_next_word``` four times and XOR each word with the corresponding columns in the state. There will be 44 values in the key schedule for a 128 bit key and 60 for a 256 bit key. The entire key is loaded into the key schedule and then a special function is performed using rotation, substitution, and round constants to generate the next value, followed by a series of XOR's to generate the rest. This recrsive strategy fills up the entire key schedule.
 ### EasyWord
+```EasyWord``` is a wrapper class for a ```uint32_t``` that allows the user to very easily set bytes and also get bytes. It abstracts away little endian byte storage and can be implicitly casted as a ```uint32_t```. ```EasyWord``` is the datatype we use in our keymaster and key schedule because it makes key expansion much easier, since key expansion involved lots of getting and setting of individual bits. 
 
 ### AES
+The ```AES``` class performs the core of the AES algorithm. AES's ```encrypt_this``` method takes in data via its ```_vectortext``` parameter and pads the input with 0s until it reaches a length divisible by 16, creating a string of data that can be evenly split into 128 bit blocks.
+
+Then, ```encrypt_this``` puts each block into a state matrix and performs a series of transformations on the state. Given a number of rounds (from KeyMaster), the method performs byte substitution, row shifting, column mixing, and round key adding, over and over. Finally, it performs a single round without column mixing and returns the encrypted text.
+
+For decryption, ```decrypt_this``` also puts its input blocks into state and performs a series of (inverse) transformations on the state. Given a number of rounds, it runs inverse row shifting, inverse byte substitution, round key addition, and inverse column mixing. On its final round, it similarly performs all of the above steps without mixing columns. It then returns the decrypted text.
+
+Each of the canonical encryption and decryption methods are commented with references to their definition and explication in the NIST technical specifications. In an effort to improve our algorithm's expedience and simplicity, many of our methods, including row shifting, byte substitution, and column mixing are hardcoded. Though normally, this design choice would be frowned upon, in this case, our algorithm works as a black box – receiving input text to encrypt and decrypt and returning its results. Thus, at the top of ```aes.cc```, we define ```S_TABLE```, ```INV_S_TABLE```, and several ```mult``` arrays.  
 
 ## Running AES
 

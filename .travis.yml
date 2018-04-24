@@ -1,0 +1,17 @@
+language: cpp
+compiler: gcc
+
+before_install:
+  - sudo apt-get install g++-5
+  - path=$( pwd )
+  - sudo apt-get install libgtest-dev
+  - sudo apt-get install cmake
+  - cd /usr/src/gtest
+  - sudo cmake CMakeLists.txt
+  - sudo make
+  - sudo cp *.a /usr/lib
+  - cd $path
+
+script:
+  - make
+  - make test
