@@ -1,10 +1,10 @@
+#include <stdint.h>
 #include <cassert>
 #include <cmath>
 #include <functional>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
-#include <stdint.h>
 #include <vector>
 
 #include "aes.h"
@@ -226,12 +226,11 @@ const uint8_t AES::mult_14[256] = {
     0xd7, 0xd9, 0xcb, 0xc5, 0xef, 0xe1, 0xf3, 0xfd, 0xa7, 0xa9, 0xbb, 0xb5,
     0x9f, 0x91, 0x83, 0x8d};
 
-
 // Convert a string into a vector of bytes
 vector<uint8_t> string_to_byte_vector(string input) {
   vector<uint8_t> byte_vector_;
   for (int i = 0; i < input.size(); i++) {
-    uint8_t char_byte_ = (uint8_t) input[i];
+    uint8_t char_byte_ = (uint8_t)input[i];
     byte_vector_.emplace_back(char_byte_);
   }
   return byte_vector_;
@@ -240,20 +239,18 @@ vector<uint8_t> string_to_byte_vector(string input) {
 // Generate a string of hex values from a byte vector
 string hex_string(const vector<uint8_t> &bytes) {
   stringstream hex_bytes_;
-  for(int i = 0; i<bytes.size(); i++){
+  for (int i = 0; i < bytes.size(); i++) {
     hex_bytes_ << hex << (int)bytes[i];
   }
   return hex_bytes_.str();
 }
 
-
-
-//Big endian pass in
+// Big endian pass in
 EasyWord::EasyWord(uint8_t byte0, uint8_t byte1, uint8_t byte2, uint8_t byte3) {
-    set_byte(0, byte0);
-    set_byte(1, byte1);
-    set_byte(2, byte2);
-    set_byte(3, byte3);
+  set_byte(0, byte0);
+  set_byte(1, byte1);
+  set_byte(2, byte2);
+  set_byte(3, byte3);
 }
 
 // index 0 refers to the leftmost byte, index 3 is rightmost
@@ -261,34 +258,34 @@ uint8_t EasyWord::get_byte(int index) {
   assert(index >= 0 && index <= 3);
   // haha this is pretty much cheating at c++
   uint8_t *byte_ptr = reinterpret_cast<uint8_t *>(&word_);
-  return byte_ptr[3-index];
+  return byte_ptr[3 - index];
 }
 
 void EasyWord::set_byte(int index, uint8_t _val) {
   assert(index >= 0 && index <= 3);
   // haha this is pretty much cheating at c++
   uint8_t *byte_ptr = reinterpret_cast<uint8_t *>(&word_);
-  byte_ptr[3-index] = _val;
+  byte_ptr[3 - index] = _val;
 }
 
 KeyMaster::KeyMaster(const vector<uint8_t> &_key)
-    : key_Nb(4), key_Nk(_key.size() / key_Nb),
+    : key_Nb(4),
+      key_Nk(_key.size() / key_Nb),
       key_Nr(_key.size() == 16 ? 10 : 14) {
-  key_schedule_ = new EasyWord[(key_Nb * (key_Nr + 1))+4];
-  key_schedule_posterior_ = &key_schedule_[(key_Nb * (key_Nr + 1))-1];
+  key_schedule_ = new EasyWord[(key_Nb * (key_Nr + 1)) + 4];
+  key_schedule_posterior_ = &key_schedule_[(key_Nb * (key_Nr + 1)) - 1];
 
   // detect key size and generate appropriate key schedule
-  if(key_Nr == 10){
+  if (key_Nr == 10) {
     generate_128_bit_key_schedule(_key);
-  }
-  else{
+  } else {
     generate_256_bit_key_schedule(_key);
   }
 }
 
 void KeyMaster::print_key_schedule() {
   cout << hex << *key_schedule_posterior_ << endl;
-  for(int i = (key_Nr+1)*key_Nb -1; i>=0; i--){
+  for (int i = (key_Nr + 1) * key_Nb - 1; i >= 0; i--) {
     cout << hex << key_schedule_[i];
   }
   cout << endl;
@@ -310,7 +307,6 @@ uint32_t KeyMaster::get_last_word() {
 
 // create a key schedule using a 128 bit key
 void KeyMaster::generate_128_bit_key_schedule(const vector<uint8_t> &_key) {
-
   // add inital four words to key schedule
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j < 4; j++) {
@@ -323,10 +319,8 @@ void KeyMaster::generate_128_bit_key_schedule(const vector<uint8_t> &_key) {
   }
 }
 
-
 // create a key schedule using a 256 bit key
 void KeyMaster::generate_256_bit_key_schedule(const vector<uint8_t> &_key) {
-
   // add initial eight words to key schedule
   for (int i = 0; i < 8; i++) {
     for (int j = 0; j < 4; j++) {
@@ -334,7 +328,7 @@ void KeyMaster::generate_256_bit_key_schedule(const vector<uint8_t> &_key) {
     }
   }
   // add remaining blocks of eight words to key schedule
-  for (int i = 1; i <= key_Nr/2; i++) {
+  for (int i = 1; i <= key_Nr / 2; i++) {
     add_eight_words(i * 8);
   }
 }
@@ -359,7 +353,7 @@ void KeyMaster::add_four_words(int _ks_idx) {
 
 // adds eight new words to the key_schedule using the previous eight
 void KeyMaster::add_eight_words(int _ks_idx) {
-  //run magic function to generate magic word
+  // run magic function to generate magic word
   uint32_t magic_word =
       schedule_core(key_schedule_[_ks_idx - 1], (int)_ks_idx / key_Nk);
   // add first value
@@ -385,7 +379,6 @@ void KeyMaster::add_eight_words(int _ks_idx) {
   // add eighth value
   key_schedule_[_ks_idx + 7] =
       key_schedule_[_ks_idx + 6] ^ key_schedule_[_ks_idx - 1];
-
 }
 
 // magic function to calculate the first word per round
@@ -493,7 +486,7 @@ vector<uint8_t> AES::decrypt_this(vector<uint8_t> &_vectortext) {
     vector<uint8_t> block_output = state_to_output();
     for (uint8_t j = 0; j < block_output.size(); j++) {
       _outputtext.push_back(block_output[j]);
-      //cout << block_output[j];
+      // cout << block_output[j];
     }
   }
   return _outputtext;
@@ -526,20 +519,22 @@ void AES::add_round_key_reverse() {
   for (int word = 0; word < 4; word++) {
     EasyWord last_word = master_.get_last_word();
     for (int byte = 0; byte < 4; byte++) {
-      state_[byte][3-word] = state_[byte][3-word] ^ last_word.get_byte(byte);
+      state_[byte][3 - word] =
+          state_[byte][3 - word] ^ last_word.get_byte(byte);
     }
   }
 }
 
-vector<uint8_t> AES::multiply_column(function<uint8_t(uint8_t)> matrix[4][4], int col_index) {
-    vector<uint8_t> new_col(4, 0);
-    for (int j = 0; j < 4; j++) {
-      // go through and multiply each val in column by matrix
-      for (int k = 0; k < 4; k++) {
-        new_col[j] ^= matrix[j][k](state_[k][col_index]);
-      }
+vector<uint8_t> AES::multiply_column(function<uint8_t(uint8_t)> matrix[4][4],
+                                     int col_index) {
+  vector<uint8_t> new_col(4, 0);
+  for (int j = 0; j < 4; j++) {
+    // go through and multiply each val in column by matrix
+    for (int k = 0; k < 4; k++) {
+      new_col[j] ^= matrix[j][k](state_[k][col_index]);
     }
-    return new_col;
+  }
+  return new_col;
 }
 
 void AES::matrix_multiply(function<uint8_t(uint8_t)> matrix[4][4]) {
@@ -606,9 +601,15 @@ void AES::mix_columns() {
 //   explanation    (p.23,   5.3.3)
 void AES::inv_mix_columns() {
   function<uint8_t(uint8_t)> multiply_9 = [&](uint8_t x) { return mult_9[x]; };
-  function<uint8_t(uint8_t)> multiply_14 = [&](uint8_t x) { return mult_14[x]; };
-  function<uint8_t(uint8_t)> multiply_11 = [&](uint8_t x) { return mult_11[x]; };
-  function<uint8_t(uint8_t)> multiply_13 = [&](uint8_t x) { return mult_13[x]; };
+  function<uint8_t(uint8_t)> multiply_14 = [&](uint8_t x) {
+    return mult_14[x];
+  };
+  function<uint8_t(uint8_t)> multiply_11 = [&](uint8_t x) {
+    return mult_11[x];
+  };
+  function<uint8_t(uint8_t)> multiply_13 = [&](uint8_t x) {
+    return mult_13[x];
+  };
   function<uint8_t(uint8_t)> mult_by_mat[4][4] = {
       {multiply_14, multiply_11, multiply_13, multiply_9},
       {multiply_9, multiply_14, multiply_11, multiply_13},
