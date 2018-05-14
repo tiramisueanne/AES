@@ -1,8 +1,9 @@
+// Copyright 2018 <Singer, Kwatra, Davis> GNU
 #include <fstream>
 #include <iostream>
 #include <string>
 
-#include "aes.h"
+#include "./aes.h"
 
 #define DEBUG
 
@@ -88,7 +89,9 @@ int main(int argc, char *argv[]) {
 
   ofstream output_file(output_file_name);
   if (output_file.is_open()) {
-    output_file << output.data();
+    for (int i = 0; i < output.size(); i++) {
+      output_file << output[i];
+    }
   }
   output_file.close();
 }

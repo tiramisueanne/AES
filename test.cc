@@ -1,12 +1,12 @@
+// Copyright 2018 <Singer, Kwatra, Davis> GNU
 #include <bitset>
 #include <cstdint>
 #include <iostream>
 #include <string>
 #include <vector>
-#include "aes.h"
+#include "./aes.h"
 #include "gtest/gtest.h"
 
-using namespace std;
 #define FIX_256
 
 TEST(StringToByteVectorTest, CharCompare) {
@@ -168,7 +168,6 @@ struct AESTest128 : testing::Test {
   vector<uint8_t> text_ = string_hex_to_bytes(plaintext);
   vector<uint8_t> ciphertext_ =
       string_hex_to_bytes("69c4e0d86a7b0430d8cdb78070b4c55a");
-  // TODO: This is buggy
 
   static vector<EasyWord> bytes_to_words(vector<uint8_t> bytes_) {
     /*
@@ -185,7 +184,7 @@ struct AESTest128 : testing::Test {
 
   virtual void TearDown(){
       // delete machine;
-  };
+  }
 };
 
 TEST_F(AESTest128, InitState) {
@@ -292,10 +291,10 @@ TEST_F(AESTest128, MixColumn) {
   vector<uint8_t> correct_col = {0x04, 0x66, 0x81, 0xe5};
   function<uint8_t(uint8_t)> multiply_1 = [](uint8_t x) { return x; };
   function<uint8_t(uint8_t)> multiply_2 = [](uint8_t x) {
-    return AES::mult_2[(int)x];
+    return AES::mult_2[static_cast<int>(x)];
   };
   function<uint8_t(uint8_t)> multiply_3 = [](uint8_t x) {
-    return AES::mult_3[(int)x];
+    return AES::mult_3[static_cast<int>(x)];
   };
 
   // this is the mix_Column matrix
@@ -505,7 +504,7 @@ struct AESTest256 : testing::Test {
 
   virtual void TearDown(){
       // delete machine;
-  };
+  }
 };
 
 TEST_F(AESTest256, FullEncrypt) {

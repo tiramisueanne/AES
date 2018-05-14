@@ -1,3 +1,4 @@
+// Copyright 2018 <Singer, Kwatra, Davis> GNU
 #include <stdint.h>
 #include <cassert>
 #include <cmath>
@@ -8,8 +9,7 @@
 #include <sstream>
 #include <vector>
 
-#include "aes.h"
-using namespace std;
+#include "./aes.h"
 
 const uint8_t S_TABLE[256] = {
     0x63, 0x7C, 0x77, 0x7B, 0xF2, 0x6B, 0x6F, 0xC5, 0x30, 0x01, 0x67, 0x2B,
@@ -241,7 +241,7 @@ vector<uint8_t> string_to_byte_vector(string input) {
 string hex_string(const vector<uint8_t> &bytes) {
   stringstream hex_bytes_;
   for (int i = 0; i < bytes.size(); i++) {
-    hex_bytes_ << hex << (int)bytes[i];
+    hex_bytes_ << hex << static_cast<int>(bytes[i]);
   }
   return hex_bytes_.str();
 }
@@ -274,7 +274,9 @@ KeyMaster::KeyMaster(const vector<uint8_t> &_key)
       key_Nk(_key.size() / key_Nb),
       key_Nr(_key.size() == 16 ? 10 : 14) {
   key_schedule_ = new EasyWord[(key_Nb * (key_Nr + 1)) + 4];
+  actual_key_spot_ = key_schedule_;
   key_schedule_posterior_ = &key_schedule_[(key_Nb * (key_Nr + 1)) - 1];
+  actual_key_end_ = key_schedule_posterior_;
 
   // detect key size and generate appropriate key schedule
   if (key_Nr == 10) {
@@ -282,6 +284,11 @@ KeyMaster::KeyMaster(const vector<uint8_t> &_key)
   } else {
     generate_256_bit_key_schedule(_key);
   }
+}
+
+void KeyMaster::reset() {
+  key_schedule_ = actual_key_spot_;
+  key_schedule_posterior_ = actual_key_end_;
 }
 
 void KeyMaster::print_key_schedule() {
@@ -337,8 +344,10 @@ void KeyMaster::generate_256_bit_key_schedule(const vector<uint8_t> &_key) {
 // adds four new words to the key_schedule using the previous four
 void KeyMaster::add_four_words(int _ks_idx) {
   // run magic function to generate magic word
+  assert(key_Nk > 0);
   uint32_t magic_word =
-      schedule_core(key_schedule_[_ks_idx - 1], (int)_ks_idx / key_Nk);
+      schedule_core(key_schedule_[_ks_idx - 1],
+        reinterpret_cast<int>(_ks_idx)/ key_Nk);
   // add first value
   key_schedule_[_ks_idx] = key_schedule_[_ks_idx - 4] ^ magic_word;
   // add second value
@@ -356,7 +365,8 @@ void KeyMaster::add_four_words(int _ks_idx) {
 void KeyMaster::add_eight_words(int _ks_idx) {
   // run magic function to generate magic word
   uint32_t magic_word =
-      schedule_core(key_schedule_[_ks_idx - 1], (int)_ks_idx / key_Nk);
+      schedule_core(key_schedule_[_ks_idx - 1],
+        reinterpret_cast<int>(_ks_idx) / key_Nk);
   // add first value
   key_schedule_[_ks_idx] = key_schedule_[_ks_idx - 8] ^ magic_word;
   // add second value
@@ -423,12 +433,12 @@ vector<uint8_t> AES::encrypt_this(vector<uint8_t> &_vectortext) {
   for (uint8_t i = 0; i < to_pad; i++) {
     _vectortext.push_back(0);
   }
-
   // for each 128b block (16 * 8b)
   for (uint32_t i = 0; i < _vectortext.size(); i += 16) {
+    master_.reset();
     // get (16 * 8b) block
     vector<uint8_t> block;
-    for (uint8_t j = 0; j < 16; j++) {
+    for (uint32_t j = 0; j < 16; j++) {
       block.push_back(_vectortext[i + j]);
     }
     // put block in state
@@ -448,8 +458,8 @@ vector<uint8_t> AES::encrypt_this(vector<uint8_t> &_vectortext) {
     add_round_key();
 
     vector<uint8_t> block_output = state_to_output();
-    for (uint8_t j = 0; j < block_output.size(); j++) {
-      _outputtext.push_back(block_output[j]);
+    for (uint32_t j = 0; j < block_output.size(); j++) {
+      _outputtext.emplace_back(block_output[j]);
     }
   }
   return _outputtext;
@@ -464,6 +474,7 @@ vector<uint8_t> AES::decrypt_this(vector<uint8_t> &_vectortext) {
   // for each 128b block (16 * 8b)
   for (uint32_t i = 0; i < _vectortext.size(); i += 16) {
     // get (16 * 8b) block
+    master_.reset();
     vector<uint8_t> block;
     for (uint8_t j = 0; j < 16; j++) {
       block.push_back(_vectortext[i + j]);
@@ -486,7 +497,7 @@ vector<uint8_t> AES::decrypt_this(vector<uint8_t> &_vectortext) {
 
     vector<uint8_t> block_output = state_to_output();
     for (uint8_t j = 0; j < block_output.size(); j++) {
-      _outputtext.push_back(block_output[j]);
+      _outputtext.emplace_back(block_output[j]);
       // cout << block_output[j];
     }
   }
@@ -496,6 +507,7 @@ vector<uint8_t> AES::decrypt_this(vector<uint8_t> &_vectortext) {
 void AES::input_to_state(const vector<uint8_t> &_input) {
   for (uint8_t r = 0; r < 4; r++) {
     for (uint8_t c = 0; c < 4; c++) {
+      state_[r][c] = 0;
       state_[r][c] = _input[r + 4 * c];
     }
   }
@@ -584,10 +596,10 @@ void AES::inv_shift_rows() {
 void AES::mix_columns() {
   function<uint8_t(uint8_t)> multiply_1 = [&](uint8_t x) { return x; };
   function<uint8_t(uint8_t)> multiply_2 = [&](uint8_t x) {
-    return mult_2[(int)x];
+    return mult_2[x];
   };
   function<uint8_t(uint8_t)> multiply_3 = [&](uint8_t x) {
-    return mult_3[(int)x];
+    return mult_3[x];
   };
   // given in whitepaper
   function<uint8_t(uint8_t)> mult_by_mat[4][4] = {
@@ -644,7 +656,7 @@ void AES::inv_sub_bytes() {
 }
 
 vector<uint8_t> AES::state_to_output() {
-  vector<uint8_t> output(20);
+  vector<uint8_t> output(16);
   for (uint8_t r = 0; r < 4; r++) {
     for (uint8_t c = 0; c < 4; c++) {
       output[r + 4 * c] = state_[r][c];
