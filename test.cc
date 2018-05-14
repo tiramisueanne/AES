@@ -90,7 +90,7 @@ struct KeyMasterTest : public testing::Test {
                                           'g', ' ', 'F', 'u'};
   unique_ptr<KeyMaster> master;
   void SetUp() { master = make_unique<KeyMaster>(kung_fu_vector); }
-  void TearDown(){};
+  void TearDown(){}
 };
 
 TEST_F(KeyMasterTest, Init) {
@@ -487,7 +487,7 @@ struct AESTest256 : testing::Test {
   string plaintext = "00112233445566778899aabbccddeeff";
   vector<uint8_t> text_ = string_hex_to_bytes(plaintext);
 
-  // TODO: Implement bytes_to_words
+  // TODO(sueanne): implement this in both structs
   static vector<EasyWord> bytes_to_words(vector<uint8_t> bytes_) {
     /*
     vector<EasyWord> _words;
