@@ -88,8 +88,8 @@ struct KeyMasterTest : public testing::Test {
   const vector<uint8_t> kung_fu_vector = {'T', 'h', 'a', 't', 's', ' ',
                                           'm', 'y', ' ', 'K', 'u', 'n',
                                           'g', ' ', 'F', 'u'};
-  KeyMaster* master;
-  void SetUp() { master = new KeyMaster(kung_fu_vector); }
+  unique_ptr<KeyMaster> master;
+  void SetUp() { master = make_unique<KeyMaster>(kung_fu_vector); }
   void TearDown(){};
 };
 
@@ -106,7 +106,7 @@ TEST_F(KeyMasterTest, NumRounds) {
 
 #ifdef FIX_256
   const vector<uint8_t> long_vector(32, 42);
-  KeyMaster* longmaster = new KeyMaster(long_vector);
+  unique_ptr<KeyMaster> longmaster = make_unique<KeyMaster>(long_vector);
   EXPECT_EQ(longmaster->get_num_rounds(), 14);
 #endif
 }
@@ -127,7 +127,7 @@ TEST_F(KeyMasterTest, RoundKeys256Bit) {
       0x60, 0x3d, 0xeb, 0x10, 0x15, 0xca, 0x71, 0xbe, 0x2b, 0x73, 0xae,
       0xf0, 0x85, 0x7d, 0x77, 0x81, 0x1f, 0x35, 0x2c, 0x07, 0x3b, 0x61,
       0x08, 0xd7, 0x2d, 0x98, 0x10, 0xa3, 0x09, 0x14, 0xdf, 0xf4};
-  KeyMaster* longmaster = new KeyMaster(long_vector);
+  unique_ptr<KeyMaster> longmaster(make_unique<KeyMaster>(long_vector));
   for (int i = 0; i < 4 * (longmaster->get_num_rounds()); i++) {
     longmaster->get_next_word();
   }
@@ -163,7 +163,7 @@ struct AESTest128 : testing::Test {
     return bytes_;
   }
 
-  AES* machine;
+  unique_ptr<AES> machine;
   string plaintext = "00112233445566778899aabbccddeeff";
   vector<uint8_t> text_ = string_hex_to_bytes(plaintext);
   vector<uint8_t> ciphertext_ =
@@ -180,7 +180,7 @@ struct AESTest128 : testing::Test {
   virtual void SetUp() {
     string FIPS_128 = "000102030405060708090a0b0c0d0e0f";
     vector<uint8_t> key_128 = string_hex_to_bytes(FIPS_128);
-    machine = new AES(key_128);
+    machine = make_unique<AES>(key_128);
   }
 
   virtual void TearDown(){
@@ -457,6 +457,7 @@ TEST_F(AESTest128, FullEncrypt) {
     EXPECT_EQ(end_encrypt[i], encrypted[i]);
   }
 }
+
 struct AESTest256 : testing::Test {
   void check_vector_state(vector<uint8_t> vec) {
     for (int col = 0; col < 4; col++) {
@@ -466,6 +467,7 @@ struct AESTest256 : testing::Test {
     }
   }
 
+  // The correct keys are given as strings
   static vector<uint8_t> string_hex_to_bytes(string _hex) {
     vector<uint8_t> bytes_;
     for (int i = 0; i < _hex.size() - 1; i += 2) {
@@ -482,11 +484,11 @@ struct AESTest256 : testing::Test {
     return bytes_;
   }
 
-  AES* machine;
+  unique_ptr<AES> machine;
   string plaintext = "00112233445566778899aabbccddeeff";
   vector<uint8_t> text_ = string_hex_to_bytes(plaintext);
-  // TODO: This is buggy
 
+  // TODO: Implement bytes_to_words
   static vector<EasyWord> bytes_to_words(vector<uint8_t> bytes_) {
     /*
     vector<EasyWord> _words;
@@ -498,13 +500,14 @@ struct AESTest256 : testing::Test {
     string FIPS_256 =
         "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f";
     vector<uint8_t> key_256 = string_hex_to_bytes(FIPS_256);
-    machine = new AES(key_256);
+    machine = make_unique<AES>(key_256);
   }
 
   virtual void TearDown(){
       // delete machine;
   };
 };
+
 TEST_F(AESTest256, FullEncrypt) {
   vector<uint8_t> end_encrypt =
       AESTest256::string_hex_to_bytes("8ea2b7ca516745bfeafc49904b496089");
@@ -516,14 +519,10 @@ TEST_F(AESTest256, FullEncrypt) {
 
 TEST_F(AESTest128, CheckFirstKey) {
   machine->input_to_state(ciphertext_);
-  cout << "We are testing input to state" << endl;
   check_vector_state(ciphertext_);
-
-  // this is the key if we want
 
   vector<uint8_t> check_s =
       string_hex_to_bytes("13111d7fe3944a17f307a78b4d2b30c5");
-  machine->master_.print_key_schedule();
   machine->add_round_key_reverse();
 }
 
